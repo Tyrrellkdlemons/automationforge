@@ -1,13 +1,13 @@
 import {
   json,
   loadCredentials,
-  saveCredentials,
   hashPassword,
   signToken,
   sessionCookie,
-  clearSessionCookie,
+  credentialsCookie,
   readSession,
   parseBody,
+  multiCookieHeaders,
 } from "./_shared.mjs";
 
 export async function handler(event) {
@@ -35,25 +35,28 @@ export async function handler(event) {
       return json(400, { error: "Choose a password other than the default" });
     }
 
-    const creds = await loadCredentials();
+    const creds = loadCredentials(event);
     creds.passwordHash = hashPassword(newPassword);
     creds.mustChangePassword = false;
     creds.updatedAt = new Date().toISOString();
-    await saveCredentials(creds);
 
     const token = signToken({
       sub: creds.username,
       mustChangePassword: false,
     });
 
-    return json(
-      200,
-      { ok: true, mustChangePassword: false },
-      { "Set-Cookie": sessionCookie(token) }
+    const cookieBits = multiCookieHeaders(
+      sessionCookie(token),
+      credentialsCookie(creds)
     );
+
+    return {
+      statusCode: 200,
+      ...cookieBits,
+      body: JSON.stringify({ ok: true, mustChangePassword: false }),
+    };
   } catch (err) {
+    console.error("change-password error", err);
     return json(500, { error: err.message || "Password change failed" });
   }
 }
-
-export { clearSessionCookie };

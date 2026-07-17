@@ -14,13 +14,14 @@ export async function handler(event) {
       return json(401, { authenticated: false });
     }
 
-    const creds = await loadCredentials();
+    const creds = loadCredentials(event);
     return json(200, {
       authenticated: true,
       username: session.sub || creds.username,
       mustChangePassword: !!creds.mustChangePassword,
     });
   } catch (err) {
+    console.error("me error", err);
     return json(500, { error: err.message || "Session check failed" });
   }
 }

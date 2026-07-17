@@ -4,7 +4,9 @@ import {
   verifyPassword,
   signToken,
   sessionCookie,
+  credentialsCookie,
   parseBody,
+  multiCookieHeaders,
 } from "./_shared.mjs";
 
 export async function handler(event) {
@@ -21,7 +23,7 @@ export async function handler(event) {
       return json(400, { error: "Username and password required" });
     }
 
-    const creds = await loadCredentials();
+    const creds = loadCredentials(event);
     if (
       username !== creds.username ||
       !verifyPassword(password, creds.passwordHash)
@@ -34,16 +36,22 @@ export async function handler(event) {
       mustChangePassword: !!creds.mustChangePassword,
     });
 
-    return json(
-      200,
-      {
+    const cookieBits = multiCookieHeaders(
+      sessionCookie(token),
+      credentialsCookie(creds)
+    );
+
+    return {
+      statusCode: 200,
+      ...cookieBits,
+      body: JSON.stringify({
         ok: true,
         username: creds.username,
         mustChangePassword: !!creds.mustChangePassword,
-      },
-      { "Set-Cookie": sessionCookie(token) }
-    );
+      }),
+    };
   } catch (err) {
+    console.error("login error", err);
     return json(500, { error: err.message || "Login failed" });
   }
 }
