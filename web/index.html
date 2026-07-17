@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PeeezMachine — Command Center</title>
+  <title>PEEEZMachine AppFlow | Secure Workflow Operations</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Roboto+Condensed:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -14,15 +15,20 @@
 
   <section id="view-login" class="view centered" hidden>
     <div class="auth-panel">
-      <p class="eyebrow">PeeezMachine</p>
-      <div class="brand-mark"><span class="mark" aria-hidden="true"></span><p class="brand">PeeezMachine</p></div>
-      <h1>Operator sign in</h1>
+      <span class="brand-mark">
+        <span class="brand-gear" aria-hidden="true"><span>P</span></span>
+        <span class="brand-words">
+          <strong>PEEEZ<span>Machine</span></strong>
+          <small>AppFlow · Secure operations</small>
+        </span>
+      </span>
+      <h1>Sign in</h1>
       <p class="sub">Submission intake · unique IDs · follow-ups · local fill engine</p>
       <form id="login-form">
         <label>Username<input id="login-user" name="username" autocomplete="username" required /></label>
         <label>Password<input id="login-pass" name="password" type="password" autocomplete="current-password" required /></label>
         <p id="login-error" class="error" hidden></p>
-        <button type="submit" class="btn primary">Enter command center</button>
+        <button type="submit" class="btn primary">Continue</button>
       </form>
       <p class="hint">Default first login: <code>admin</code> / <code>admin</code> — you must change the password.</p>
     </div>
@@ -30,8 +36,13 @@
 
   <section id="view-change" class="view centered" hidden>
     <div class="auth-panel">
-      <p class="eyebrow">PeeezMachine</p>
-      <p class="brand">PeeezMachine</p>
+      <span class="brand-mark">
+        <span class="brand-gear" aria-hidden="true"><span>P</span></span>
+        <span class="brand-words">
+          <strong>PEEEZ<span>Machine</span></strong>
+          <small>AppFlow · Secure operations</small>
+        </span>
+      </span>
       <h1>Set your password</h1>
       <p class="sub">Required once before you can operate the dashboard.</p>
       <form id="change-form">
@@ -46,7 +57,13 @@
   <section id="view-app" class="view app" hidden>
     <header class="topbar">
       <div>
-        <div class="brand-mark"><span class="mark" aria-hidden="true"></span><p class="brand compact">PeeezMachine</p></div>
+        <span class="brand-mark">
+        <span class="brand-gear" aria-hidden="true"><span>P</span></span>
+        <span class="brand-words">
+          <strong>PEEEZ<span>Machine</span></strong>
+          <small>AppFlow · Secure operations</small>
+        </span>
+      </span>
         <p class="tagline">Public intake → unique ID → 3 sign-up flows → 24–48h follow-up</p>
       </div>
       <div class="topbar-actions">
@@ -64,7 +81,7 @@
           <button class="nav-btn" data-tab="export" type="button">3. Download &amp; run</button>
           <button class="nav-btn" data-tab="logs" type="button">Logs</button>
         </nav>
-        <p class="sidebar-link"><a href="/submit">Public PeeezMachine form →</a></p>
+        <p class="sidebar-link"><a href="/submit">Public PEEEZMachine form →</a></p>
         <div class="sidebar-note">
           <strong>Operator safety</strong>
           Site submits still need your approval on the local machine. Legitimate personal use only.
@@ -73,10 +90,10 @@
 
       <div class="content">
         <article id="tab-pipeline" class="tab">
-          <p class="eyebrow">How PeeezMachine works now</p>
+          <p class="eyebrow">How PEEEZMachine works now</p>
           <h2>Live workflow checkpoint</h2>
           <p class="lead">
-            Same PeeezMachine brand — new intake engine: state-based address, instant unique ID,
+            Same PEEEZMachine brand — new intake engine: state-based address, instant unique ID,
             confirmation email, three sign-up flows, then your 24–48 hour follow-up.
           </p>
           <div class="pipeline">
@@ -151,7 +168,7 @@
 
         <article id="tab-workflow" class="tab" hidden>
           <h2>Applications (1–5 URLs)</h2>
-          <p class="lead">Local batch fill — separate from the PeeezMachine public intake pipeline.</p>
+          <p class="lead">Local batch fill — separate from the PEEEZMachine public intake pipeline.</p>
           <div class="workflow-meta">
             <label>Default profile
               <select id="default-profile">

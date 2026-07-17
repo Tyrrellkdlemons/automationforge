@@ -166,7 +166,7 @@ def run_worker_loop(*, once: bool = False) -> None:
         Panel(
             f"Worker polling every {interval}s · skips status==manual\n"
             "Issues unique ID + confirmation email BEFORE flows. Site submits still need y/n.",
-            title="PeeezMachine Worker",
+            title="PEEEZMachine AppFlow Worker",
             border_style="green",
         )
     )

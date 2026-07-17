@@ -63,9 +63,9 @@ STATUS_PILL_CSS: dict[str, tuple[str, str]] = {
 
 CUSTOM_CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap');
-html, body, [class*="css"] { font-family: 'Outfit', system-ui, sans-serif; }
-h1, h2, h3 { font-family: 'Syne', system-ui, sans-serif !important; letter-spacing: -0.02em; }
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Roboto+Condensed:wght@700;900');
+html, body, [class*="css"] { font-family: 'IBM Plex Sans', system-ui, sans-serif; }
+h1, h2, h3 { font-family: 'Roboto Condensed', system-ui, sans-serif !important; letter-spacing: -0.02em; }
 .stApp { background: linear-gradient(180deg, #061019 0%, #020405 55%, #010203 100%); }
 [data-testid="stSidebar"] { background: #091722; border-right: 1px solid rgba(215,167,43,0.22); }
 .status-pill {
@@ -966,14 +966,14 @@ def render_manual_handling() -> None:
 
 
 def main() -> None:
-    st.set_page_config(page_title="PeeezMachine", page_icon="P", layout="wide")
+    st.set_page_config(page_title="PEEEZMachine AppFlow", page_icon="P", layout="wide")
     st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
     _init_session_state()
 
     dm = DataManager()
     llm = LLMAgent()
 
-    st.title("PeeezMachine")
+    st.title("PEEEZMachine AppFlow")
     st.caption(
         "Command center · Public intake · Unique IDs · Manual flows · Follow-ups · "
         "Every site SUBMIT needs your approval · Legitimate personal use only."

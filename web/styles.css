@@ -16,9 +16,9 @@
   --danger: #ed5b4f;
   --ok: #44d679;
   --radius: 10px;
-  --font: "Outfit", system-ui, sans-serif;
-  --display: "Syne", system-ui, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  --font: "IBM Plex Sans", system-ui, sans-serif;
+  --display: "Roboto Condensed", "Arial Narrow", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
   color-scheme: dark;
 }
 

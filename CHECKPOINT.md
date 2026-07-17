@@ -1,7 +1,7 @@
-# PeeezMachine — workflow checkpoint
+# PEEEZMachine AppFlow — workflow checkpoint
 
 **Saved:** 2026-07-17  
-**Brand:** PeeezMachine (engine: AutomationForge modules under the hood)  
+**Brand:** PEEEZMachine AppFlow (engine: AutomationForge modules under the hood)  
 **Firebase:** `automationforge-app`
 
 ## Checkpointed pipeline
@@ -23,17 +23,18 @@ User /submit
 
 | End | URL / command |
 |-----|----------------|
-| Public | https://automationforge-429d00fc.netlify.app/submit |
-| Admin web | https://automationforge-429d00fc.netlify.app |
+| Public | https://peeezmachine-appflow.netlify.app/submit |
+| Admin web | https://peeezmachine-appflow.netlify.app |
 | Local GUI | `.\serve.ps1` → http://localhost:8501 |
 | Worker | `.\work.ps1` |
+| GitHub | https://github.com/Tyrrellkdlemons/peeezmachine-appflow |
 
 Full access notes: **ACCESS.txt**
 
 ## UI theme
 
-Ink / gold PeeezMachine theme on Netlify admin + public form (Outfit + Syne).
-Streamlit titled PeeezMachine.
+Ink / navy / gold PEEEZMachine AppFlow theme on Netlify admin + public form.
+Streamlit titled PEEEZMachine AppFlow.
 
 ## Do not break
 
