@@ -14,7 +14,7 @@ def _settings() -> dict[str, str]:
         "port": os.getenv("EMAIL_SMTP_PORT", "587"),
         "sender": os.getenv("EMAIL_SENDER", os.getenv("GMAIL_IMAP_USER", "")),
         "password": os.getenv("EMAIL_PASSWORD", os.getenv("GMAIL_IMAP_PASSWORD", "")),
-        "from_name": os.getenv("EMAIL_FROM_NAME", "AutomationForge"),
+        "from_name": os.getenv("EMAIL_FROM_NAME", "PeeezMachine"),
     }
 
 
@@ -60,20 +60,20 @@ def send_confirmation_email(
         f"Address on file: {address_line}\n"
         f"Your unique ID is: {unique_id}\n\n"
         "Full verification and next-step instructions will arrive within 24-48 hours.\n\n"
-        "— AutomationForge\n"
+        "— PeeezMachine\n"
     )
     html = f"""
     <p>{greeting}</p>
-    <p>Thank you for submitting your information.</p>
+    <p>Thank you for submitting your information to PeeezMachine.</p>
     <ul>
       <li><strong>Name:</strong> {first_name} {last_name}</li>
       <li><strong>Address on file:</strong> {address_line}</li>
       <li><strong>Your unique ID:</strong> <code>{unique_id}</code></li>
     </ul>
     <p>Full verification and next-step instructions will arrive within <strong>24–48 hours</strong>.</p>
-    <p>— AutomationForge</p>
+    <p>— PeeezMachine</p>
     """
-    return _send(to_email, "Your unique ID confirmation", text, html)
+    return _send(to_email, "PeeezMachine — your unique ID confirmation", text, html)
 
 
 def send_unique_id_email(to_email: str, unique_id: str, *, first_name: str = "") -> dict[str, Any]:

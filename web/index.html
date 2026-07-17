@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AutomationForge</title>
+  <title>PeeezMachine — Command Center</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -14,24 +14,26 @@
 
   <section id="view-login" class="view centered" hidden>
     <div class="auth-panel">
-      <p class="brand">AutomationForge</p>
-      <h1>Sign in</h1>
-      <p class="sub">Fill your info once · queue up to 5 applications · run locally</p>
+      <p class="eyebrow">PeeezMachine</p>
+      <div class="brand-mark"><span class="mark" aria-hidden="true"></span><p class="brand">PeeezMachine</p></div>
+      <h1>Operator sign in</h1>
+      <p class="sub">Submission intake · unique IDs · follow-ups · local fill engine</p>
       <form id="login-form">
         <label>Username<input id="login-user" name="username" autocomplete="username" required /></label>
         <label>Password<input id="login-pass" name="password" type="password" autocomplete="current-password" required /></label>
         <p id="login-error" class="error" hidden></p>
-        <button type="submit" class="btn primary">Continue</button>
+        <button type="submit" class="btn primary">Enter command center</button>
       </form>
-      <p class="hint">Default: <code>admin</code> / <code>admin</code> — change password on first login.</p>
+      <p class="hint">Default first login: <code>admin</code> / <code>admin</code> — you must change the password.</p>
     </div>
   </section>
 
   <section id="view-change" class="view centered" hidden>
     <div class="auth-panel">
-      <p class="brand">AutomationForge</p>
-      <h1>Change password</h1>
-      <p class="sub">Required before you can use the dashboard.</p>
+      <p class="eyebrow">PeeezMachine</p>
+      <p class="brand">PeeezMachine</p>
+      <h1>Set your password</h1>
+      <p class="sub">Required once before you can operate the dashboard.</p>
       <form id="change-form">
         <label>New password<input id="new-pass" type="password" autocomplete="new-password" minlength="8" required /></label>
         <label>Confirm password<input id="confirm-pass" type="password" autocomplete="new-password" minlength="8" required /></label>
@@ -44,8 +46,8 @@
   <section id="view-app" class="view app" hidden>
     <header class="topbar">
       <div>
-        <p class="brand compact">AutomationForge</p>
-        <p class="tagline">Simple setup · 1–5 URL workflow · local fill engine</p>
+        <div class="brand-mark"><span class="mark" aria-hidden="true"></span><p class="brand compact">PeeezMachine</p></div>
+        <p class="tagline">Public intake → unique ID → 3 sign-up flows → 24–48h follow-up</p>
       </div>
       <div class="topbar-actions">
         <span id="whoami" class="whoami"></span>
@@ -56,24 +58,55 @@
     <main class="layout">
       <aside class="sidebar">
         <nav>
-          <button class="nav-btn active" data-tab="info" type="button">1. My info</button>
+          <button class="nav-btn active" data-tab="pipeline" type="button">Pipeline</button>
+          <button class="nav-btn" data-tab="info" type="button">1. My info</button>
           <button class="nav-btn" data-tab="workflow" type="button">2. Applications</button>
           <button class="nav-btn" data-tab="export" type="button">3. Download &amp; run</button>
           <button class="nav-btn" data-tab="logs" type="button">Logs</button>
         </nav>
-        <p class="sidebar-link"><a href="/submit">Public submission form →</a></p>
+        <p class="sidebar-link"><a href="/submit">Public PeeezMachine form →</a></p>
         <div class="sidebar-note">
-          <strong>Safety</strong>
-          Every form submit still needs your yes/no on your computer. Legitimate personal use only.
+          <strong>Operator safety</strong>
+          Site submits still need your approval on the local machine. Legitimate personal use only.
         </div>
       </aside>
 
       <div class="content">
-        <!-- MY INFO -->
-        <article id="tab-info" class="tab">
-          <h2>My info</h2>
-          <p class="lead">Type once. These fields are used to fill applications. No JSON required.</p>
+        <article id="tab-pipeline" class="tab">
+          <p class="eyebrow">How PeeezMachine works now</p>
+          <h2>Live workflow checkpoint</h2>
+          <p class="lead">
+            Same PeeezMachine brand — new intake engine: state-based address, instant unique ID,
+            confirmation email, three sign-up flows, then your 24–48 hour follow-up.
+          </p>
+          <div class="pipeline">
+            <div class="pipeline-step">
+              <div class="n">1</div>
+              <div><strong>Public submit</strong><span>User enters name, email, DOB, state. Address optional → generated in-state.</span></div>
+            </div>
+            <div class="pipeline-step">
+              <div class="n">2</div>
+              <div><strong>Unique ID + confirmation</strong><span>Worker issues 8XX/9XX-XX-XXXX and emails it before any site fills.</span></div>
+            </div>
+            <div class="pipeline-step">
+              <div class="n">3</div>
+              <div><strong>Three sign-up flows</strong><span>Newsletter · SaaS trial · Job profile — or Manual takeover in Streamlit.</span></div>
+            </div>
+            <div class="pipeline-step">
+              <div class="n">4</div>
+              <div><strong>Follow-up command center</strong><span>Send 24–48h instructions from Streamlit Follow-ups.</span></div>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat"><span class="stat-label">User form</span><span class="stat-value">/submit</span></div>
+            <div class="stat"><span class="stat-label">Local GUI</span><span class="stat-value">.\serve.ps1</span></div>
+            <div class="stat"><span class="stat-label">Worker</span><span class="stat-value">.\work.ps1</span></div>
+          </div>
+        </article>
 
+        <article id="tab-info" class="tab" hidden>
+          <h2>My info</h2>
+          <p class="lead">Type once for local fill profiles. Separate from public submissions.</p>
           <form id="info-form" class="form-grid">
             <fieldset>
               <legend>Identity</legend>
@@ -84,7 +117,6 @@
               <label>Phone<input name="phone" type="tel" autocomplete="tel" /></label>
               <label>Date of birth<input name="date_of_birth" type="date" /></label>
             </fieldset>
-
             <fieldset>
               <legend>Address</legend>
               <label class="span-2">Street<input name="street" autocomplete="street-address" /></label>
@@ -93,26 +125,23 @@
               <label>ZIP<input name="zip" autocomplete="postal-code" /></label>
               <label>Country<input name="country" autocomplete="country-name" /></label>
             </fieldset>
-
             <fieldset>
               <legend>Extras (optional)</legend>
-              <label>LinkedIn<input name="linkedin" placeholder="https://linkedin.com/in/…" /></label>
-              <label>Website<input name="website" placeholder="https://…" /></label>
-              <label class="span-2">Notes<textarea name="notes" rows="2" placeholder="Anything the forms often ask…"></textarea></label>
+              <label>LinkedIn<input name="linkedin" /></label>
+              <label>Website<input name="website" /></label>
+              <label class="span-2">Notes<textarea name="notes" rows="2"></textarea></label>
             </fieldset>
-
             <fieldset>
               <legend>Application type extras</legend>
-              <p class="field-hint">Only fill what you need for the apps you’re running today.</p>
-              <label>Desired salary<input name="desired_salary" placeholder="e.g. 85000" /></label>
-              <label>Years experience<input name="years_experience" placeholder="e.g. 5" /></label>
-              <label>Work authorization<input name="work_authorization" placeholder="Authorized to work" /></label>
-              <label>Monthly income<input name="monthly_income" placeholder="e.g. 6000" /></label>
+              <p class="field-hint">Only fill what you need today.</p>
+              <label>Desired salary<input name="desired_salary" /></label>
+              <label>Years experience<input name="years_experience" /></label>
+              <label>Work authorization<input name="work_authorization" /></label>
+              <label>Monthly income<input name="monthly_income" /></label>
               <label>Employer<input name="employer" /></label>
               <label>Move-in date<input name="move_in_date" type="date" /></label>
             </fieldset>
           </form>
-
           <div class="toolbar sticky-actions">
             <button id="btn-save-info" class="btn primary" type="button">Save my info</button>
             <button id="btn-clear-info" class="btn ghost" type="button">Clear form</button>
@@ -120,14 +149,11 @@
           </div>
         </article>
 
-        <!-- WORKFLOW 1-5 URLS -->
         <article id="tab-workflow" class="tab" hidden>
           <h2>Applications (1–5 URLs)</h2>
-          <p class="lead">Paste the application links you want filled this session. Max 5. Each can use a different profile.</p>
-
+          <p class="lead">Local batch fill — separate from the PeeezMachine public intake pipeline.</p>
           <div class="workflow-meta">
-            <label>
-              Default profile for new rows
+            <label>Default profile
               <select id="default-profile">
                 <option value="general">General</option>
                 <option value="job_application">Job application</option>
@@ -135,14 +161,9 @@
                 <option value="registration">Registration</option>
               </select>
             </label>
-            <label>
-              Workflow name
-              <input id="workflow-name" placeholder="e.g. Friday apps" />
-            </label>
+            <label>Workflow name<input id="workflow-name" placeholder="e.g. Friday apps" /></label>
           </div>
-
           <div id="url-rows" class="url-rows"></div>
-
           <div class="toolbar">
             <button id="btn-add-url" class="btn ghost" type="button">+ Add URL</button>
             <button id="btn-save-workflow" class="btn primary" type="button">Save workflow</button>
@@ -151,11 +172,9 @@
           <p class="muted" id="url-count-hint">0 of 5 applications</p>
         </article>
 
-        <!-- EXPORT & RUN -->
         <article id="tab-export" class="tab" hidden>
           <h2>Download &amp; run</h2>
-          <p class="lead">Download both files into your project folder, then run one command.</p>
-
+          <p class="lead">For local fills. Public submissions use Firebase + <code>.\work.ps1</code>.</p>
           <div class="export-cards">
             <div class="export-card">
               <h3>personal_data.json</h3>
@@ -168,12 +187,12 @@
               <button id="btn-dl-workflow" class="btn primary" type="button">Download workflow</button>
             </div>
           </div>
-
           <h3 class="subhead">On your computer</h3>
-          <pre class="codeblock"># Put both JSON files in the project folder, then:
+          <pre class="codeblock">.\GET_IN.ps1
+.\serve.ps1
+.\work.ps1
+# or local batch:
 python main.py --workflow workflow.json</pre>
-          <p class="muted">The agent opens each URL in order, fills with your info, and asks <strong>y/n</strong> before every submit.</p>
-
           <details class="advanced">
             <summary>Advanced: raw JSON</summary>
             <textarea id="data-editor" spellcheck="false" aria-label="personal data JSON"></textarea>
@@ -185,10 +204,9 @@ python main.py --workflow workflow.json</pre>
           </details>
         </article>
 
-        <!-- LOGS -->
         <article id="tab-logs" class="tab" hidden>
           <h2>Logs</h2>
-          <p class="lead">Upload <code>application_log.json</code> from local runs to review here.</p>
+          <p class="lead">Upload local <code>application_log.json</code> to review here.</p>
           <div class="toolbar">
             <label class="btn ghost file-btn">Upload log JSON<input id="upload-log" type="file" accept="application/json,.json" hidden /></label>
             <button id="btn-clear-log" class="btn ghost" type="button">Clear view</button>

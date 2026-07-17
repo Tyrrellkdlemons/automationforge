@@ -32,5 +32,9 @@ netlify/functions/submit-submission/node_modules/
 
 # Firebase credentials (never commit real keys)
 firebase_key.json
+*firebase-adminsdk*.json
 !firebase_key.json.example
+
+# Local access notes (may contain secrets)
+ACCESS.txt
 

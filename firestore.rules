@@ -1,8 +1,6 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Public clients never talk to Firestore directly.
-    // Only the Netlify Admin SDK + local worker/service account write data.
     match /{document=**} {
       allow read, write: if false;
     }

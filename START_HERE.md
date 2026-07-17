@@ -1,16 +1,16 @@
-# AutomationForge — how to get in, work, and serve
+# PEEEZMachine AppFlow — how to get in, work, and serve
 
 ## Access links (both ends)
 
 | Who | Link |
 |-----|------|
-| **Public submit (user)** | https://automationforge-429d00fc.netlify.app/submit |
-| **Admin web panel** | https://automationforge-429d00fc.netlify.app |
+| **Public submit (user)** | https://peeezmachine-appflow.netlify.app/submit |
+| **Admin web panel** | https://peeezmachine-appflow.netlify.app |
 | **Local admin GUI** | http://localhost:8501 after `.\serve.ps1` |
-| **GitHub** | https://github.com/Tyrrellkdlemons/automationforge |
+| **GitHub** | https://github.com/Tyrrellkdlemons/peeezmachine-appflow |
 
 Form access token = `SUBMISSION_SECRET` in `.env`  
-Quick link: `https://automationforge-429d00fc.netlify.app/submit?token=YOUR_SECRET`
+Quick link: `https://peeezmachine-appflow.netlify.app/submit?token=YOUR_SECRET`
 
 ---
 

@@ -60,7 +60,7 @@ exports.handler = async function handler(event) {
       amount,
       currency,
       automatic_payment_methods: { enabled: true },
-      metadata: { product: "automationforge_submission" },
+      metadata: { product: "peeezmachine_appflow_submission" },
     });
     return {
       statusCode: 200,

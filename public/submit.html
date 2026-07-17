@@ -3,36 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Submit — AutomationForge</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif&display=swap" rel="stylesheet" />
+  <title>Get started — PeeezMachine</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css" />
   <script src="https://js.stripe.com/v3/"></script>
   <style>
-    .submit-wrap { max-width: 540px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; position: relative; z-index: 1; }
-    .submit-wrap h1 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; font-size: 2.4rem; margin: 0.25rem 0 0.5rem; }
-    .submit-card { background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line); border-radius: 16px; padding: 1.5rem; }
-    .success-box { border: 1px solid var(--accent-dim); background: rgba(62,207,142,.1); border-radius: 12px; padding: 1rem; margin-top: 1rem; }
+    .submit-wrap { max-width: 540px; margin: 0 auto; padding: 2.75rem 1.25rem 4rem; position: relative; z-index: 1; }
+    .submit-wrap h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 5vw, 2.55rem); letter-spacing: -0.03em; margin: 0.2rem 0 0.55rem; }
+    .submit-card { background: color-mix(in srgb, var(--panel) 94%, transparent); border: 1px solid var(--line); border-radius: 18px; padding: 1.5rem; box-shadow: var(--shadow); }
+    .success-box { border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); background: rgba(228,168,75,.1); border-radius: 14px; padding: 1.1rem; margin-top: 1rem; animation: rise .4s ease-out; }
     .addr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
     .addr-grid .span-2 { grid-column: 1 / -1; }
     #payment-section[hidden], #success[hidden] { display: none !important; }
     #card-element { padding: .75rem; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-elev); margin: .5rem 0 1rem; }
+    .trust { margin-top: 1.25rem; font-size: .82rem; color: var(--muted); line-height: 1.45; }
     @media (max-width: 600px) { .addr-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <div class="bg-grid" aria-hidden="true"></div>
   <div class="submit-wrap">
-    <p class="brand">AutomationForge</p>
-    <h1>Public submission</h1>
-    <p class="lead" style="color:var(--muted)">Required: name, email, DOB, and state. Street/city/ZIP optional — we’ll generate a residential address in your state if missing.</p>
+    <p class="eyebrow">PeeezMachine</p>
+    <div class="brand-mark"><span class="mark" aria-hidden="true"></span><p class="brand">PeeezMachine</p></div>
+    <h1>Start your submission</h1>
+    <p class="lead" style="color:var(--muted);margin:0 0 1.25rem;line-height:1.5">
+      Required: name, email, date of birth, and state.
+      Street / city / ZIP are optional — if blank, PeeezMachine assigns a residential address in your state.
+    </p>
 
     <form id="submit-form" class="submit-card">
       <label>First name *<input name="firstName" required autocomplete="given-name" /></label>
       <label>Last name *<input name="lastName" required autocomplete="family-name" /></label>
       <label>Email *<input name="email" type="email" required autocomplete="email" /></label>
-      <label>Phone (optional, for SMS)<input name="phone" type="tel" autocomplete="tel" /></label>
+      <label>Phone (optional)<input name="phone" type="tel" autocomplete="tel" /></label>
       <label>Date of birth *<input name="dob" type="date" required /></label>
-      <label>State * (required)
+      <label>State *
         <select name="state" id="state" required></select>
       </label>
       <p style="color:var(--muted);font-size:.9rem;margin:.5rem 0">Address details (optional)</p>
@@ -51,23 +56,27 @@
         </label>
       </div>
 
-      <details open style="margin-top:.75rem">
+      <details style="margin-top:.75rem">
         <summary style="cursor:pointer;color:var(--muted);font-size:.85rem">Access token</summary>
         <label>Submission secret
-          <input id="submission-secret" type="password" required placeholder="Provided by admin" />
+          <input id="submission-secret" type="password" required placeholder="Provided by PeeezMachine" />
         </label>
       </details>
 
       <p id="form-error" class="error" hidden></p>
-      <button type="submit" class="btn primary" id="btn-submit">Submit</button>
+      <button type="submit" class="btn primary" id="btn-submit">Submit to PeeezMachine</button>
     </form>
 
     <div id="success" class="success-box" hidden>
-      <strong>Submission received</strong>
-      <p>Your submission ID:</p>
+      <strong>You’re in — PeeezMachine received your submission</strong>
+      <p style="margin:.55rem 0 0">Submission ID:</p>
       <code id="submission-id"></code>
-      <p style="margin-top:.75rem;color:var(--muted);font-size:.9rem">Your unique ID confirmation email arrives when processing starts (usually minutes). Full verification follows in 24–48 hours.</p>
+      <p style="margin-top:.85rem;color:var(--muted);font-size:.9rem;line-height:1.45">
+        Your unique ID confirmation email is sent when processing starts.
+        Full verification and next-step instructions arrive within <strong>24–48 hours</strong>.
+      </p>
     </div>
+    <p class="trust">🛡️ Data is encrypted in transit. Only PeeezMachine operators can process your submission.</p>
   </div>
 
   <script>
@@ -76,11 +85,13 @@
     sel.innerHTML = '<option value="">Select state</option>' + STATES.map(([c,n]) => `<option value="${c}">${n} (${c})</option>`).join("");
 
     const params = new URLSearchParams(location.search);
-    if (params.get("token")) document.getElementById("submission-secret").value = params.get("token");
+    if (params.get("token")) {
+      document.getElementById("submission-secret").value = params.get("token");
+      document.querySelector("details").open = true;
+    }
 
     let cfg = { paywallEnabled: false, paymentProvider: "stripe" };
     let stripe, elements, card;
-    let paymentIntentId = null;
 
     async function loadConfig() {
       try {
@@ -92,7 +103,7 @@
       section.hidden = false;
       document.getElementById("amount-label").textContent = cfg.amountLabel || "";
       if (cfg.paymentProvider === "stripe" && cfg.stripePublishableKey && window.Stripe) {
-        document.getElementById("payment-help").textContent = "Pay with card (Stripe). Submit unlocks after payment succeeds.";
+        document.getElementById("payment-help").textContent = "Secure card payment (Stripe).";
         stripe = Stripe(cfg.stripePublishableKey);
         elements = stripe.elements();
         card = elements.create("card");
@@ -101,12 +112,12 @@
         document.getElementById("manual-pay-wrap").hidden = false;
         document.getElementById("card-element").hidden = true;
         document.getElementById("payment-help").textContent =
-          "Paywall uses " + (cfg.paymentProvider || "manual") + " — enter your payment/receipt reference after paying (GoDaddy, etc.).";
+          "Pay via " + (cfg.paymentProvider || "manual") + ", then enter your reference.";
       }
     }
     loadConfig();
 
-    async function ensureStripePaid() {
+    async function ensurePaid() {
       if (!cfg.paywallEnabled) return null;
       if (cfg.paymentProvider !== "stripe" || !stripe) {
         const ref = document.getElementById("payment-ref").value.trim();
@@ -120,12 +131,9 @@
       });
       const intentData = await intentRes.json();
       if (!intentRes.ok) throw new Error(intentData.error || "Could not start payment");
-      const result = await stripe.confirmCardPayment(intentData.clientSecret, {
-        payment_method: { card },
-      });
+      const result = await stripe.confirmCardPayment(intentData.clientSecret, { payment_method: { card } });
       if (result.error) throw new Error(result.error.message);
-      paymentIntentId = result.paymentIntent.id;
-      return paymentIntentId;
+      return result.paymentIntent.id;
     }
 
     const form = document.getElementById("submit-form");
@@ -138,9 +146,9 @@
       err.hidden = true;
       success.hidden = true;
       btn.disabled = true;
-      btn.textContent = "Working…";
+      btn.textContent = "Sending…";
       try {
-        const payId = await ensureStripePaid();
+        const payId = await ensurePaid();
         const fd = new FormData(form);
         const payload = {
           firstName: String(fd.get("firstName") || "").trim(),
@@ -173,7 +181,7 @@
         err.textContent = ex.message || "Error";
       } finally {
         btn.disabled = false;
-        btn.textContent = "Submit";
+        btn.textContent = "Submit to PeeezMachine";
       }
     });
   </script>

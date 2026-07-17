@@ -1,8 +1,8 @@
 {
-  "name": "automationforge",
+  "name": "peeezmachine-appflow",
   "version": "2.0.0",
   "private": true,
-  "description": "AutomationForge v2 — local agent + Netlify web dashboard",
+  "description": "PEEEZMachine AppFlow — secure workflow operations + public submissions",
   "scripts": {
     "dev": "netlify dev",
     "build": "echo 'Static site — no build step'"

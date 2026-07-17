@@ -960,14 +960,18 @@ def render_manual_handling() -> None:
 
 
 def main() -> None:
-    st.set_page_config(page_title="AutomationForge", page_icon="AF", layout="wide")
+    st.set_page_config(page_title="PeeezMachine", page_icon="P", layout="wide")
     st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
     _init_session_state()
 
     dm = DataManager()
     llm = LLMAgent()
 
-    st.title("AutomationForge v2")
+    st.title("PeeezMachine")
+    st.caption(
+        "Command center · Public intake · Unique IDs · Manual flows · Follow-ups · "
+        "Every site SUBMIT needs your approval."
+    )
     st.caption(
         "Local personal form assistant · Every SUBMIT needs your approval · "
         "Legitimate personal use only — you are responsible for ToS and laws."
