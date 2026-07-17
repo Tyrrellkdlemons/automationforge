@@ -63,6 +63,11 @@ STATUS_PILL_CSS: dict[str, tuple[str, str]] = {
 
 CUSTOM_CSS = """
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap');
+html, body, [class*="css"] { font-family: 'Outfit', system-ui, sans-serif; }
+h1, h2, h3 { font-family: 'Syne', system-ui, sans-serif !important; letter-spacing: -0.02em; }
+.stApp { background: linear-gradient(180deg, #061019 0%, #020405 55%, #010203 100%); }
+[data-testid="stSidebar"] { background: #091722; border-right: 1px solid rgba(215,167,43,0.22); }
 .status-pill {
     display: inline-block;
     padding: 3px 12px;
@@ -74,9 +79,9 @@ CUSTOM_CSS = """
     white-space: nowrap;
 }
 .metric-card {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 10px;
+    background: rgba(13,34,48,0.85);
+    border: 1px solid rgba(215,167,43,0.22);
+    border-radius: 12px;
     padding: 0.75rem 1rem;
 }
 .metric-card .label {
@@ -88,13 +93,14 @@ CUSTOM_CSS = """
     font-size: 1.6rem;
     font-weight: 700;
     line-height: 1.2;
+    color: #f3cf63;
 }
 .log-box {
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 0.82rem;
     line-height: 1.45;
-    background: #0b1220;
-    border: 1px solid rgba(255,255,255,0.1);
+    background: #05090d;
+    border: 1px solid rgba(215,167,43,0.22);
     border-radius: 8px;
     padding: 0.75rem 1rem;
     max-height: 420px;
@@ -103,22 +109,22 @@ CUSTOM_CSS = """
     word-break: break-word;
 }
 .log-line { margin: 0.15rem 0; }
-.log-info { color: #94a3b8; }
-.log-success { color: #4ade80; }
-.log-warn { color: #fbbf24; }
-.log-error { color: #f87171; }
+.log-info { color: #9daab5; }
+.log-success { color: #44d679; }
+.log-warn { color: #f3cf63; }
+.log-error { color: #ed5b4f; }
 .sub-row {
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 10px;
+    border: 1px solid rgba(215,167,43,0.18);
+    border-radius: 12px;
     padding: 0.85rem 1rem;
     margin-bottom: 0.65rem;
-    background: rgba(255,255,255,0.02);
+    background: rgba(13,34,48,0.55);
 }
 .summary-card {
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px;
+    border: 1px solid rgba(215,167,43,0.22);
+    border-radius: 12px;
     padding: 1rem 1.1rem;
-    background: rgba(255,255,255,0.03);
+    background: rgba(13,34,48,0.7);
 }
 </style>
 """
@@ -970,11 +976,7 @@ def main() -> None:
     st.title("PeeezMachine")
     st.caption(
         "Command center · Public intake · Unique IDs · Manual flows · Follow-ups · "
-        "Every site SUBMIT needs your approval."
-    )
-    st.caption(
-        "Local personal form assistant · Every SUBMIT needs your approval · "
-        "Legitimate personal use only — you are responsible for ToS and laws."
+        "Every site SUBMIT needs your approval · Legitimate personal use only."
     )
 
     with st.sidebar:

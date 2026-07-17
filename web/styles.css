@@ -16,9 +16,9 @@
   --danger: #ed5b4f;
   --ok: #44d679;
   --radius: 10px;
-  --font: "IBM Plex Sans", system-ui, sans-serif;
-  --display: "Roboto Condensed", "Arial Narrow", sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --font: "Outfit", system-ui, sans-serif;
+  --display: "Syne", system-ui, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
   color-scheme: dark;
 }
 
@@ -73,6 +73,17 @@ body {
   align-items: center;
   gap: 12px;
   margin: 0 0 0.85rem;
+}
+.mark {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background:
+    radial-gradient(circle at 50% 50%, #0a1821 0 38%, transparent 39%),
+    conic-gradient(from 20deg, var(--accent-bright), var(--accent-dim), var(--blue-bright), var(--accent-bright));
+  box-shadow: 0 0 18px rgba(215, 167, 43, 0.25), inset 0 0 0 6px #071019;
 }
 .brand-gear {
   width: 44px;
@@ -133,6 +144,15 @@ body {
   text-transform: uppercase;
 }
 .brand.compact { font-size: 1.35rem; margin: 0; }
+.eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--accent-bright);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
 .tagline, .sub, .muted, .hint { color: var(--muted); }
 .sub { margin: 0 0 1.5rem; }
 .hint { font-size: 0.85rem; margin-top: 1.25rem; }
