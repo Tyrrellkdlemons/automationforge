@@ -197,6 +197,9 @@ input:focus, textarea:focus {
   border-radius: 10px;
 }
 .sidebar-note strong { color: var(--warn); display: block; margin-bottom: 0.35rem; }
+.sidebar-link { margin: 0.5rem 0; }
+.sidebar-link a { color: var(--accent); text-decoration: none; font-size: 0.9rem; }
+.sidebar-link a:hover { text-decoration: underline; }
 
 .content { padding: 1.75rem 1.75rem 3rem; max-width: 920px; }
 .content h2 {

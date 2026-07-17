@@ -471,12 +471,29 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--force", action="store_true", help="Force runs even if URL was logged before")
     parser.add_argument("--skip-email", action="store_true", help="Skip optional email verification step")
+    parser.add_argument(
+        "--worker",
+        action="store_true",
+        help="Poll Firestore for new public submissions and run 3 sign-up flows",
+    )
+    parser.add_argument(
+        "--worker-once",
+        action="store_true",
+        help="Process one worker poll cycle then exit",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
     print_banner()
+
+    if args.worker or args.worker_once:
+        from worker import run_worker_loop
+
+        run_worker_loop(once=bool(args.worker_once))
+        return
+
     dm = DataManager()
     llm = LLMAgent()
 

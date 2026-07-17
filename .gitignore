@@ -27,3 +27,10 @@ node_modules/
 .netlify/
 package-lock.json
 .auth_secret.tmp
+.submission_secret.tmp
+netlify/functions/submit-submission/node_modules/
+
+# Firebase credentials (never commit real keys)
+firebase_key.json
+!firebase_key.json.example
+

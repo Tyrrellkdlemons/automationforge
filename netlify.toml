@@ -1,16 +1,23 @@
 [build]
   publish = "web"
   functions = "netlify/functions"
-  command = "npm install"
+  command = "npm install && npm install --prefix netlify/functions/submit-submission && node -e \"require('fs').copyFileSync('public/submit.html','web/submit.html')\""
 
 [functions]
   node_bundler = "esbuild"
+  directory = "netlify/functions"
+
+[[redirects]]
+  from = "/submit"
+  to = "/submit.html"
+  status = 200
 
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
 
+# Keep SPA fallback last so real files like /submit.html are served first
 [[redirects]]
   from = "/*"
   to = "/index.html"
