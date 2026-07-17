@@ -4,8 +4,6 @@
  */
 const admin = require("firebase-admin");
 
-let initTried = false;
-
 const US_STATES = new Set([
   "AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN","IA",
   "KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM",
@@ -29,11 +27,18 @@ function json(statusCode, body) {
 
 function initFirebase() {
   if (admin.apps.length) return;
-  if (initTried) return;
-  initTried = true;
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
   if (!raw) throw new Error("FIREBASE_SERVICE_ACCOUNT_JSON is not set");
-  admin.initializeApp({ credential: admin.credential.cert(JSON.parse(raw)) });
+  let cred;
+  try {
+    cred = JSON.parse(raw);
+  } catch (err) {
+    throw new Error("FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON");
+  }
+  if (typeof cred.private_key === "string") {
+    cred.private_key = cred.private_key.replace(/\\n/g, "\n");
+  }
+  admin.initializeApp({ credential: admin.credential.cert(cred) });
 }
 
 function parseBody(event) {

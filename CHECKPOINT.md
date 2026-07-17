@@ -1,7 +1,8 @@
 # PeeezMachine — workflow checkpoint
 
 **Saved:** 2026-07-17  
-**Brand:** PeeezMachine (engine modules may still say AutomationForge internally)  
+**Brand:** PeeezMachine  
+**Primary URL:** https://peeezmachine-appflow.netlify.app  
 **Firebase:** `automationforge-app`
 
 ## Checkpointed pipeline
@@ -23,8 +24,8 @@ User /submit
 
 | End | URL / command |
 |-----|----------------|
-| Public | https://automationforge-429d00fc.netlify.app/submit |
-| Admin web | https://automationforge-429d00fc.netlify.app |
+| Public | https://peeezmachine-appflow.netlify.app/submit |
+| Admin web | https://peeezmachine-appflow.netlify.app |
 | Local GUI | `.\serve.ps1` → http://localhost:8501 |
 | Worker | `.\work.ps1` |
 
@@ -32,7 +33,7 @@ Full access notes: **ACCESS.txt**
 
 ## UI theme
 
-Ink / gold PeeezMachine theme on Netlify admin + public form (gear mark + Roboto Condensed / IBM Plex).
+Ink / gold PeeezMachine gear mark on Netlify admin + public form.
 Streamlit titled PeeezMachine with matching gold accents.
 
 ## Do not break
