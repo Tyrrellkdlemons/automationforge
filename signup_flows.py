@@ -78,29 +78,37 @@ def get_flows() -> list[FlowDef]:
 def build_personal_from_submission(submission: dict[str, Any]) -> dict[str, Any]:
     """Build a temporary AutomationForge personal-data dict from a Firestore submission."""
     from address_utils import format_address_line, resolve_address
+    from field_randomizer import ensure_randomized_fields
 
     first = str(submission.get("firstName") or "").strip()
     last = str(submission.get("lastName") or "").strip()
     email = str(submission.get("email") or "").strip()
     dob = str(submission.get("dob") or submission.get("dateOfBirth") or "").strip()
-    address, randomized = resolve_address(submission.get("address"))
-    password = submission.get("generated_password") or _gen_password()
+    state = submission.get("state") or (submission.get("address") or {}).get("state")
+    address, randomized = resolve_address(submission.get("address"), state=state)
+    fields = ensure_randomized_fields(submission)
+    password = fields.get("password") or submission.get("generated_password")
 
-    return {
+    personal = {
         "first_name": first,
         "last_name": last,
         "full_name": f"{first} {last}".strip(),
+        "middle_initial": fields.get("middle_initial") or "",
         "email": email,
-        "phone": str(submission.get("phone") or ""),
+        "phone": str(submission.get("phone") or fields.get("phone_alt") or ""),
         "date_of_birth": dob,
         "address": address,
         "address_line": format_address_line(address),
         "generated_password": password,
         "password": password,
+        "username": fields.get("username") or "",
         "address_randomized": randomized,
         "notes": "Temporary profile built from public submission.",
         "custom_fields": {},
     }
+    for k, v in fields.items():
+        personal[k] = v
+    return personal
 
 
 ApproveFn = Callable[[dict[str, Any]], bool]

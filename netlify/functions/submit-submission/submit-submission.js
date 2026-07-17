@@ -1,12 +1,17 @@
 /**
  * Netlify Function: create a Firestore submission from the public form.
- *
- * Auth: require header `x-submission-secret` matching env SUBMISSION_SECRET.
- * Credentials: FIREBASE_SERVICE_ACCOUNT_JSON (stringified service account).
+ * Requires state. Optional street/city/zip. Optional paymentIntentId when paywall on.
  */
 const admin = require("firebase-admin");
 
 let initTried = false;
+
+const US_STATES = new Set([
+  "AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN","IA",
+  "KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM",
+  "NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA",
+  "WV","WI","WY",
+]);
 
 function json(statusCode, body) {
   return {
@@ -26,15 +31,9 @@ function initFirebase() {
   if (admin.apps.length) return;
   if (initTried) return;
   initTried = true;
-
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
-  if (!raw) {
-    throw new Error("FIREBASE_SERVICE_ACCOUNT_JSON is not set");
-  }
-  const sa = typeof raw === "string" ? JSON.parse(raw) : raw;
-  admin.initializeApp({
-    credential: admin.credential.cert(sa),
-  });
+  if (!raw) throw new Error("FIREBASE_SERVICE_ACCOUNT_JSON is not set");
+  admin.initializeApp({ credential: admin.credential.cert(JSON.parse(raw)) });
 }
 
 function parseBody(event) {
@@ -56,65 +55,100 @@ function isValidDob(dob) {
 }
 
 exports.handler = async function handler(event) {
-  if (event.httpMethod === "OPTIONS") {
-    return json(204, {});
-  }
-  if (event.httpMethod !== "POST") {
-    return json(405, { error: "Method not allowed" });
-  }
+  if (event.httpMethod === "OPTIONS") return json(204, {});
+  if (event.httpMethod !== "POST") return json(405, { error: "Method not allowed" });
 
   try {
     const expected = process.env.SUBMISSION_SECRET || "";
     const provided =
-      event.headers["x-submission-secret"] ||
-      event.headers["X-Submission-Secret"] ||
-      "";
-    if (!expected || provided !== expected) {
-      return json(401, { error: "Unauthorized" });
-    }
+      event.headers["x-submission-secret"] || event.headers["X-Submission-Secret"] || "";
+    if (!expected || provided !== expected) return json(401, { error: "Unauthorized" });
 
     const body = parseBody(event);
     const firstName = String(body.firstName || "").trim();
     const lastName = String(body.lastName || "").trim();
     const email = String(body.email || "").trim().toLowerCase();
     const dob = String(body.dob || body.dateOfBirth || "").trim();
-    const addressRaw = body.address;
+    const phone = String(body.phone || "").trim();
+    const state = String(body.state || "").trim().toUpperCase();
+    const street = String(body.street || (body.address && body.address.street) || "").trim();
+    const city = String(body.city || (body.address && body.address.city) || "").trim();
+    const zip = String(body.zip || (body.address && body.address.zip) || "").trim();
+    const paymentIntentId = String(body.paymentIntentId || body.paymentRef || "").trim();
 
-    if (!firstName || !lastName) {
-      return json(400, { error: "First name and last name are required" });
-    }
-    if (!email || !email.includes("@")) {
-      return json(400, { error: "A valid email is required" });
-    }
-    if (!isValidDob(dob)) {
-      return json(400, { error: "Date of birth must be YYYY-MM-DD" });
-    }
+    if (!firstName || !lastName) return json(400, { error: "First name and last name are required" });
+    if (!email || !email.includes("@")) return json(400, { error: "A valid email is required" });
+    if (!isValidDob(dob)) return json(400, { error: "Date of birth must be YYYY-MM-DD" });
+    if (!US_STATES.has(state)) return json(400, { error: "A valid US state is required" });
 
-    let address = null;
-    if (typeof addressRaw === "string" && addressRaw.trim()) {
-      address = { street: addressRaw.trim(), city: "", state: "", zip: "", country: "United States" };
-    } else if (addressRaw && typeof addressRaw === "object") {
-      address = {
-        street: String(addressRaw.street || "").trim(),
-        city: String(addressRaw.city || "").trim(),
-        state: String(addressRaw.state || "").trim(),
-        zip: String(addressRaw.zip || addressRaw.postal || "").trim(),
-        country: String(addressRaw.country || "United States").trim(),
-      };
-      if (!address.street && !address.city) address = null;
-    }
+    const paywall = (process.env.PAYWALL_ENABLED || "false").toLowerCase() === "true";
+    const provider = (process.env.PAYMENT_PROVIDER || "stripe").toLowerCase();
+    let paid = false;
 
     initFirebase();
     const db = admin.firestore();
+
+    if (paywall) {
+      if (provider === "stripe") {
+        if (!paymentIntentId) return json(402, { error: "Payment required" });
+        const payDoc = await db.collection("payments").doc(paymentIntentId).get();
+        // Also accept client-confirmed intents when webhook hasn't landed yet: verify via Stripe
+        if (payDoc.exists && payDoc.data().status === "succeeded") {
+          paid = true;
+        } else if (process.env.STRIPE_SECRET_KEY) {
+          const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+          const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
+          if (pi.status === "succeeded") {
+            paid = true;
+            await db.collection("payments").doc(paymentIntentId).set(
+              {
+                status: "succeeded",
+                amount: pi.amount,
+                currency: pi.currency,
+                createdAt: new Date().toISOString(),
+                provider: "stripe",
+              },
+              { merge: true }
+            );
+          }
+        }
+        if (!paid) return json(402, { error: "Payment not completed" });
+      } else {
+        // GoDaddy / manual / other — require a payment reference string
+        if (!paymentIntentId) {
+          return json(402, {
+            error: "Payment reference required (GoDaddy/manual). Pass paymentRef after collecting payment.",
+          });
+        }
+        paid = true;
+        await db.collection("payments").doc(paymentIntentId).set(
+          {
+            status: "recorded",
+            provider,
+            createdAt: new Date().toISOString(),
+          },
+          { merge: true }
+        );
+      }
+    }
+
     const now = new Date().toISOString();
     const doc = {
       firstName,
       lastName,
       email,
+      phone,
       dob,
-      address,
+      state,
+      address: { street, city, state, zip, country: "United States" },
       status: "new",
       issued_id: null,
+      paid,
+      paymentIntentId: paymentIntentId || null,
+      paymentProvider: paywall ? provider : null,
+      followup_sent: false,
+      followup_history: [],
+      confirmationEmailSent: false,
       flows: {
         newsletter: { status: "pending", error: null },
         saas_trial: { status: "pending", error: null },
@@ -122,6 +156,7 @@ exports.handler = async function handler(event) {
       },
       manualOverride: false,
       manualLogs: [],
+      randomized_fields: {},
       createdAt: now,
       updatedAt: now,
     };
@@ -130,7 +165,8 @@ exports.handler = async function handler(event) {
     return json(200, {
       ok: true,
       submissionId: ref.id,
-      message: "Submission received. You will receive your unique ID by email after processing.",
+      message:
+        "Submission received. You will receive your unique ID by email shortly after processing starts.",
     });
   } catch (err) {
     console.error("submit-submission error", err);

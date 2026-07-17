@@ -1,4 +1,4 @@
-"""SMTP email sender for unique-ID delivery (Gmail app password supported)."""
+"""SMTP email sender — confirmation, unique ID, and follow-up messages."""
 
 from __future__ import annotations
 
@@ -18,30 +18,20 @@ def _settings() -> dict[str, str]:
     }
 
 
-def send_unique_id_email(to_email: str, unique_id: str, *, first_name: str = "") -> dict[str, Any]:
-    """Send the unique ID notification email. Returns {ok, error?}."""
+def _send(to_email: str, subject: str, text_body: str, html_body: str | None = None) -> dict[str, Any]:
     cfg = _settings()
     if not cfg["sender"] or not cfg["password"]:
-        return {
-            "ok": False,
-            "error": "EMAIL_SENDER / EMAIL_PASSWORD not configured in .env",
-        }
+        return {"ok": False, "error": "EMAIL_SENDER / EMAIL_PASSWORD not configured in .env"}
     if not to_email or "@" not in to_email:
         return {"ok": False, "error": "Invalid recipient email"}
 
-    greeting = f"Hi {first_name}," if first_name else "Hi,"
-    body = (
-        f"{greeting}\n\n"
-        f"Your unique ID is: {unique_id}\n\n"
-        "Thank you for signing up.\n\n"
-        "— AutomationForge\n"
-    )
-
     msg = EmailMessage()
-    msg["Subject"] = "Your unique ID"
+    msg["Subject"] = subject
     msg["From"] = f"{cfg['from_name']} <{cfg['sender']}>"
     msg["To"] = to_email
-    msg.set_content(body)
+    msg.set_content(text_body)
+    if html_body:
+        msg.add_alternative(html_body, subtype="html")
 
     try:
         port = int(cfg["port"])
@@ -52,3 +42,56 @@ def send_unique_id_email(to_email: str, unique_id: str, *, first_name: str = "")
         return {"ok": True}
     except Exception as exc:
         return {"ok": False, "error": str(exc)}
+
+
+def send_confirmation_email(
+    *,
+    to_email: str,
+    first_name: str,
+    last_name: str,
+    address_line: str,
+    unique_id: str,
+) -> dict[str, Any]:
+    greeting = f"Hi {first_name}," if first_name else "Hi,"
+    text = (
+        f"{greeting}\n\n"
+        f"Thank you for submitting your information.\n\n"
+        f"Name: {first_name} {last_name}\n"
+        f"Address on file: {address_line}\n"
+        f"Your unique ID is: {unique_id}\n\n"
+        "Full verification and next-step instructions will arrive within 24-48 hours.\n\n"
+        "— AutomationForge\n"
+    )
+    html = f"""
+    <p>{greeting}</p>
+    <p>Thank you for submitting your information.</p>
+    <ul>
+      <li><strong>Name:</strong> {first_name} {last_name}</li>
+      <li><strong>Address on file:</strong> {address_line}</li>
+      <li><strong>Your unique ID:</strong> <code>{unique_id}</code></li>
+    </ul>
+    <p>Full verification and next-step instructions will arrive within <strong>24–48 hours</strong>.</p>
+    <p>— AutomationForge</p>
+    """
+    return _send(to_email, "Your unique ID confirmation", text, html)
+
+
+def send_unique_id_email(to_email: str, unique_id: str, *, first_name: str = "") -> dict[str, Any]:
+    """Backward-compatible short notifier."""
+    return send_confirmation_email(
+        to_email=to_email,
+        first_name=first_name,
+        last_name="",
+        address_line="(see portal)",
+        unique_id=unique_id,
+    )
+
+
+def send_followup_email(
+    *,
+    to_email: str,
+    subject: str,
+    body_text: str,
+    body_html: str | None = None,
+) -> dict[str, Any]:
+    return _send(to_email, subject or "Follow-up", body_text, body_html)

@@ -43,7 +43,19 @@ def get_firestore():
             if not cred_path.exists():
                 _init_error = f"Service account file not found: {cred_path}"
                 raise RuntimeError(_init_error)
-            cred = credentials.Certificate(str(cred_path))
+            raw = cred_path.read_text(encoding="utf-8")
+            try:
+                data = json.loads(raw)
+            except json.JSONDecodeError as exc:
+                _init_error = f"Invalid JSON in {cred_path}: {exc}"
+                raise RuntimeError(_init_error) from exc
+            if "private_key" not in data or data.get("_comment"):
+                _init_error = (
+                    f"{cred_path} is still a placeholder. Download a real service "
+                    "account key from Firebase Console → Project settings → Service accounts."
+                )
+                raise RuntimeError(_init_error)
+            cred = credentials.Certificate(data)
         elif raw_json:
             cred = credentials.Certificate(json.loads(raw_json))
         else:
@@ -180,11 +192,43 @@ def claim_number(number: str, submission_id: str) -> bool:
 
 def submission_stats() -> dict[str, int]:
     rows = list_submissions(limit=500)
-    stats = {"total": len(rows), "new": 0, "processing": 0, "manual": 0, "completed": 0, "failed": 0}
+    stats = {
+        "total": len(rows),
+        "new": 0,
+        "processing": 0,
+        "manual": 0,
+        "completed": 0,
+        "failed": 0,
+        "pending_followups": 0,
+    }
     for r in rows:
         status = (r.get("status") or "new").lower()
         if status in stats:
             stats[status] += 1
-        else:
-            stats["total"]  # ignore unknown in typed buckets
+        if status == "completed" and not r.get("followup_sent"):
+            stats["pending_followups"] += 1
     return stats
+
+
+def list_pending_followups(limit: int = 100) -> list[dict[str, Any]]:
+    rows = list_submissions(limit=500)
+    out = [
+        r
+        for r in rows
+        if (r.get("status") or "").lower() == "completed" and not r.get("followup_sent")
+    ]
+    return out[:limit]
+
+
+def append_followup_history(submission_id: str, entry: dict[str, Any]) -> None:
+    db = get_firestore()
+    from firebase_admin import firestore as fs
+
+    db.collection("submissions").document(submission_id).update(
+        {
+            "followup_history": fs.ArrayUnion([entry]),
+            "followup_sent": True,
+            "followup_sent_at": _utc_now(),
+            "updatedAt": _utc_now(),
+        }
+    )

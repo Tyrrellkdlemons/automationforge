@@ -7,6 +7,7 @@ Pages:
   • Local fill — personal URL pipeline (same safety rules as CLI)
   • Submissions — Firestore admin table + worker retry
   • Manual handling — operator GUI for one submission / one flow at a time
+  • Follow-ups — pending follow-up email command center
 
 Every external-site SUBMIT still requires explicit operator approval.
 """
@@ -30,11 +31,13 @@ import streamlit as st
 from automationforge.browser_controller import BrowserController
 from automationforge.data_manager import DataManager, normalize_url
 from automationforge.llm_agent import LLMAgent
-from email_sender import send_unique_id_email
+from email_sender import send_followup_email, send_unique_id_email
 from firebase_client import (
+    append_followup_history,
     append_manual_log,
     firestore_ready,
     get_submission,
+    list_pending_followups,
     list_submissions,
     submission_stats,
     update_submission,
@@ -43,7 +46,12 @@ from manual_handler import ManualFlowRunner, flow_defs
 from unique_id_generator import issue_unique_id
 from worker import process_submission
 
-PAGES = ["Local fill", "Submissions", "Manual handling"]
+PAGES = ["Local fill", "Submissions", "Manual handling", "Follow-ups"]
+
+PRIVACY_BANNER = (
+    "🛡️ Data Privacy Shield — data encrypted in transit; "
+    "visible only to admin on this machine."
+)
 
 STATUS_PILL_CSS: dict[str, tuple[str, str]] = {
     "new": ("#1e3a5f", "#93c5fd"),
@@ -130,6 +138,10 @@ def _init_session_state() -> None:
     for key, value in defaults.items():
         if key not in st.session_state:
             st.session_state[key] = value
+
+
+def render_privacy_banner() -> None:
+    st.info(PRIVACY_BANNER)
 
 
 def status_pill_html(status: str) -> str:
@@ -414,6 +426,7 @@ def render_local_fill(dm: DataManager, llm: LLMAgent) -> None:
 
 def render_submissions() -> None:
     st.header("Submissions")
+    render_privacy_banner()
     st.caption("Firestore admin view — take over, retry, or inspect public form submissions.")
 
     with st.sidebar:
@@ -437,8 +450,21 @@ def render_submissions() -> None:
     m1, m2, m3, m4, m5 = st.columns(5)
     for col, key, label in zip(
         (m1, m2, m3, m4, m5),
-        ("total", "new", "processing", "completed", "failed"),
-        ("Total", "New", "Processing", "Completed", "Failed"),
+        ("total", "new", "processing", "failed", "manual"),
+        ("Total", "New", "Processing", "Failed", "Manual In Progress"),
+    ):
+        with col:
+            st.markdown(
+                f'<div class="metric-card"><div class="label">{label}</div>'
+                f'<div class="value">{stats.get(key, 0)}</div></div>',
+                unsafe_allow_html=True,
+            )
+
+    m6, m7, _ = st.columns(3)
+    for col, key, label in zip(
+        (m6, m7),
+        ("completed", "pending_followups"),
+        ("Completed", "Pending Follow-ups"),
     ):
         with col:
             st.markdown(
@@ -528,8 +554,156 @@ def _address_fields(sub: dict[str, Any]) -> dict[str, str]:
     }
 
 
+def format_address(sub: dict[str, Any]) -> str:
+    addr = _address_fields(sub)
+    parts = [addr["street"], addr["city"], addr["state"], addr["zip"]]
+    line = ", ".join(p for p in parts if p)
+    return line or "—"
+
+
+def default_followup_subject() -> str:
+    return "Next steps for your verification"
+
+
+def default_followup_body_text(sub: dict[str, Any]) -> str:
+    first = str(sub.get("firstName") or "there").strip()
+    issued = str(sub.get("issued_id") or "your assigned ID").strip()
+    return (
+        f"Hello {first},\n\n"
+        f"Your verification process is complete. Your unique ID is {issued}.\n\n"
+        f"Please visit our portal for next steps: https://example.com/portal\n\n"
+        "Thank you."
+    )
+
+
+def default_followup_body_html(sub: dict[str, Any]) -> str:
+    first = html.escape(str(sub.get("firstName") or "there").strip())
+    issued = html.escape(str(sub.get("issued_id") or "your assigned ID").strip())
+    return (
+        f"<p>Hello {first},</p>"
+        f"<p>Your verification process is complete. Your unique ID is <strong>{issued}</strong>.</p>"
+        f'<p>Please visit our portal for next steps: '
+        f'<a href="https://example.com/portal">https://example.com/portal</a></p>'
+        "<p>Thank you.</p>"
+    )
+
+
+def render_followups() -> None:
+    st.header("Follow-ups")
+    render_privacy_banner()
+    st.caption("Send portal follow-up emails to completed submissions awaiting outreach.")
+
+    with st.sidebar:
+        st.header("Follow-ups")
+        if st.button("Refresh follow-ups", key="fu_refresh"):
+            st.rerun()
+
+    ok, detail = firestore_ready()
+    if not ok:
+        st.error(f"Firebase not ready: {detail}")
+        return
+
+    try:
+        pending = list_pending_followups(limit=100)
+    except Exception as exc:
+        st.error(f"Failed to load pending follow-ups: {exc}")
+        return
+
+    with st.expander("Pending Follow-ups Command Center", expanded=True):
+        if not pending:
+            st.info("No pending follow-ups — all completed submissions have been contacted.")
+            return
+
+        st.write(f"**{len(pending)}** submission(s) awaiting follow-up.")
+        st.divider()
+
+        for sub in pending:
+            sid = sub.get("id") or ""
+            name = submission_display_name(sub)
+            email = sub.get("email") or "—"
+            issued = sub.get("issued_id") or "—"
+            address = format_address(sub)
+
+            st.markdown(
+                f'<div class="sub-row">'
+                f"<strong>{html.escape(name)}</strong><br>"
+                f"Email: {html.escape(str(email))}<br>"
+                f"Issued ID: {html.escape(str(issued))}<br>"
+                f"Address: {html.escape(address)}"
+                f"</div>",
+                unsafe_allow_html=True,
+            )
+
+            subject = st.text_input(
+                "Subject",
+                value=default_followup_subject(),
+                key=f"fu_subject_{sid}",
+            )
+            body_text = st.text_area(
+                "Body (plain text)",
+                value=default_followup_body_text(sub),
+                height=160,
+                key=f"fu_body_{sid}",
+            )
+            body_html = st.text_area(
+                "Body (HTML, optional)",
+                value=default_followup_body_html(sub),
+                height=160,
+                key=f"fu_body_html_{sid}",
+            )
+
+            bc1, bc2 = st.columns(2)
+            with bc1:
+                if st.button("Send Follow-up Email", key=f"fu_send_{sid}", type="primary"):
+                    result = send_followup_email(
+                        to_email=str(email),
+                        subject=subject.strip(),
+                        body_text=body_text,
+                        body_html=body_html.strip() or None,
+                    )
+                    entry = {
+                        "ts": datetime.now(timezone.utc).isoformat(),
+                        "subject": subject.strip(),
+                        "ok": bool(result.get("ok")),
+                        "error": result.get("error"),
+                    }
+                    try:
+                        append_followup_history(sid, entry)
+                        if result.get("ok"):
+                            st.success(f"Follow-up email sent to {email}.")
+                        else:
+                            st.error(result.get("error") or "Email send failed.")
+                        st.rerun()
+                    except Exception as exc:
+                        st.error(f"Could not record follow-up history: {exc}")
+
+            with bc2:
+                if st.button("Mark Sent Without Email", key=f"fu_mark_{sid}"):
+                    entry = {
+                        "ts": datetime.now(timezone.utc).isoformat(),
+                        "subject": subject.strip(),
+                        "ok": True,
+                        "error": None,
+                        "marked_without_email": True,
+                    }
+                    try:
+                        append_followup_history(sid, entry)
+                        st.success("Marked as sent without email.")
+                        st.rerun()
+                    except Exception as exc:
+                        st.error(f"Could not update submission: {exc}")
+
+            history = sub.get("followup_history") or []
+            if history:
+                with st.expander("Follow-up history", expanded=False):
+                    st.json(history)
+
+            st.divider()
+
+
 def render_manual_handling() -> None:
     st.header("Manual handling")
+    render_privacy_banner()
     st.caption("Operator console — one submission, one flow at a time with live logs.")
 
     drain_runner_events()
@@ -635,6 +809,20 @@ def render_manual_handling() -> None:
             st.write(f"**Issued ID:** {sub.get('issued_id') or '—'}")
         with meta_c3:
             st.write(f"**Created:** {sub.get('createdAt') or '—'}")
+
+        with st.expander("Generated fields", expanded=False):
+            randomized = sub.get("randomized_fields") or {}
+            if randomized:
+                for field_key, field_val in sorted(randomized.items()):
+                    st.text_input(
+                        field_key.replace("_", " ").title(),
+                        value=str(field_val),
+                        disabled=True,
+                        key=f"mh_rf_{selected_id}_{field_key}",
+                    )
+            else:
+                st.caption("No generated fields stored on this submission yet.")
+
         st.markdown("</div>", unsafe_allow_html=True)
 
     flow_list = flow_defs()
@@ -800,6 +988,8 @@ def main() -> None:
         render_local_fill(dm, llm)
     elif page == "Submissions":
         render_submissions()
+    elif page == "Follow-ups":
+        render_followups()
     else:
         render_manual_handling()
 
