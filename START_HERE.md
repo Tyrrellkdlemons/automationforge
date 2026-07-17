@@ -6,8 +6,9 @@
 |-----|-----|
 | **User form** | https://peeezmachine-appflow.netlify.app/submit |
 | **Admin web** | https://peeezmachine-appflow.netlify.app |
+| **Alias** | https://automationforge-429d00fc.netlify.app |
 | **Local GUI** | `.\serve.ps1` → http://localhost:8501 |
-| **GitHub** | https://github.com/Tyrrellkdlemons/peeezmachine-appflow |
+| **GitHub** | https://github.com/tyrrellkdlemons/automationforge |
 
 Token link: see **ACCESS.txt** (`SUBMISSION_SECRET`)
 

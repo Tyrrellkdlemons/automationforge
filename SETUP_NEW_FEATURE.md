@@ -55,6 +55,8 @@ Streamlit → Manual handling → Take Over → Start flow → Approve Submit �
 
 ## Access links
 
-- User: https://automationforge-429d00fc.netlify.app/submit  
-- Admin web: https://automationforge-429d00fc.netlify.app  
+- User: https://peeezmachine-appflow.netlify.app/submit  
+- Admin web: https://peeezmachine-appflow.netlify.app  
+- Alias: https://automationforge-429d00fc.netlify.app  
 - Local GUI: http://localhost:8501  
+

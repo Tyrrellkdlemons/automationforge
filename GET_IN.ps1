@@ -67,5 +67,6 @@ Write-Host ""
 Write-Host "=== NEXT ===" -ForegroundColor Cyan
 Write-Host "  WORK:  .\work.ps1"
 Write-Host "  SERVE: .\serve.ps1"
-Write-Host "  Form:  https://automationforge-429d00fc.netlify.app/submit"
+Write-Host "  Form:  https://peeezmachine-appflow.netlify.app/submit"
+Write-Host "  Alias: https://automationforge-429d00fc.netlify.app/submit"
 Write-Host ""
