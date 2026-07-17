@@ -1,11 +1,15 @@
 {
-  "name": "peeezmachine-appflow",
-  "version": "2.0.0",
+  "name": "automationforge",
+  "version": "2.1.0",
   "private": true,
-  "description": "PEEEZMachine AppFlow — secure workflow operations + public submissions",
+  "description": "AutomationForge command center + PEEEZ user intake (dual Netlify sites)",
   "scripts": {
     "dev": "netlify dev",
-    "build": "echo 'Static site — no build step'"
+    "build": "node scripts/build-admin.mjs",
+    "build:admin": "node scripts/build-admin.mjs",
+    "build:intake": "node scripts/build-intake.mjs",
+    "deploy:admin": "npm run build:admin && netlify deploy --prod --dir=sites/admin --functions=netlify/functions --message admin-command-center",
+    "deploy:intake": "npm run build:intake && netlify deploy --prod --dir=sites/intake --functions=netlify/functions --message user-intake"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

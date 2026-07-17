@@ -1,0 +1,27 @@
+# User intake site — peeezmachine-appflow
+# In Netlify UI set Base directory to `sites/intake` OR deploy from repo root with:
+#   Build command: node scripts/build-intake.mjs
+#   Publish: sites/intake
+#   Functions: netlify/functions
+
+[build]
+  publish = "."
+  command = "node ../../scripts/build-intake.mjs"
+
+# When this file is used with base=sites/intake, point functions at repo root via UI.
+# Preferred: configure the peeezmachine-appflow site from repo root (see root README/START_HERE).
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/submit"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
