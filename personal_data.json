@@ -1,0 +1,66 @@
+{
+  "version": 2,
+  "defaults": {
+    "first_name": "Alex",
+    "last_name": "Rivera",
+    "full_name": "Alex Rivera",
+    "email": "alex.rivera@example.com",
+    "phone": "+1-555-0100",
+    "date_of_birth": "1990-01-15",
+    "address": {
+      "street": "123 Main St",
+      "city": "Austin",
+      "state": "TX",
+      "zip": "78701",
+      "country": "United States"
+    },
+    "linkedin": "",
+    "website": "",
+    "notes": "Replace sample values with your real personal data before use."
+  },
+  "profiles": {
+    "general": {
+      "description": "Default profile for generic registrations and contact forms",
+      "overrides": {}
+    },
+    "job_application": {
+      "description": "Job / career applications",
+      "overrides": {
+        "desired_salary": "85000",
+        "years_experience": "5",
+        "work_authorization": "Authorized to work",
+        "willing_to_relocate": "Yes",
+        "cover_letter_blurb": "Experienced professional seeking new opportunities.",
+        "resume_path": "",
+        "earliest_start_date": "2026-08-01"
+      }
+    },
+    "housing": {
+      "description": "Housing / rental applications",
+      "overrides": {
+        "monthly_income": "6000",
+        "employment_status": "Employed",
+        "employer": "Acme Corp",
+        "move_in_date": "2026-08-01",
+        "number_of_occupants": "1",
+        "pets": "No",
+        "current_landlord": "",
+        "reason_for_moving": "Relocation for work"
+      }
+    },
+    "registration": {
+      "description": "Account / membership sign-ups",
+      "overrides": {
+        "username_preference": "alexrivera",
+        "newsletter_opt_in": "No",
+        "marketing_opt_in": "No"
+      }
+    }
+  },
+  "custom_fields": {
+    "emergency_contact_name": "",
+    "emergency_contact_phone": "",
+    "ssn_last4": "",
+    "driver_license": ""
+  }
+}
