@@ -1,0 +1,3 @@
+/api/*  /.netlify/functions/:splat  200
+/submit  /  302
+/*  /index.html  200

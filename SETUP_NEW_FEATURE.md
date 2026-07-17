@@ -55,6 +55,16 @@ Streamlit → Manual handling → Take Over → Start flow → Approve Submit �
 
 ## Access links
 
-- User: https://automationforge-429d00fc.netlify.app/submit  
-- Admin web: https://automationforge-429d00fc.netlify.app  
+- User intake: https://peeezmachine-appflow.netlify.app/?token=SECRET  
+- Command center: https://automationforge-429d00fc.netlify.app  
 - Local GUI: http://localhost:8501  
+
+## Dual Netlify deploy
+
+| Site | npm script | Publish dir |
+|------|------------|-------------|
+| peeezmachine-appflow | `npm run deploy:intake` | `sites/intake` |
+| automationforge-429d00fc | `npm run deploy:admin` | `sites/admin` |
+
+Put `FIREBASE_SERVICE_ACCOUNT_JSON` on **both** sites. Intake also needs `SUBMISSION_SECRET`. Admin needs `AUTH_SECRET`.
+
