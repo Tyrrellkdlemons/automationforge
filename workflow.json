@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "name": "Example workflow",
+  "created_at": "2026-07-17T00:00:00Z",
+  "applications": [
+    {
+      "url": "https://example.com/apply",
+      "profile": "job_application",
+      "notes": "Replace with your real application URL"
+    }
+  ]
+}

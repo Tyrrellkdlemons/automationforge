@@ -12,55 +12,40 @@
 <body>
   <div class="bg-grid" aria-hidden="true"></div>
 
-  <!-- LOGIN -->
   <section id="view-login" class="view centered" hidden>
     <div class="auth-panel">
       <p class="brand">AutomationForge</p>
       <h1>Sign in</h1>
-      <p class="sub">Local-first form assistant · hosted control panel</p>
+      <p class="sub">Fill your info once · queue up to 5 applications · run locally</p>
       <form id="login-form">
-        <label>
-          Username
-          <input id="login-user" name="username" autocomplete="username" required />
-        </label>
-        <label>
-          Password
-          <input id="login-pass" name="password" type="password" autocomplete="current-password" required />
-        </label>
+        <label>Username<input id="login-user" name="username" autocomplete="username" required /></label>
+        <label>Password<input id="login-pass" name="password" type="password" autocomplete="current-password" required /></label>
         <p id="login-error" class="error" hidden></p>
         <button type="submit" class="btn primary">Continue</button>
       </form>
-      <p class="hint">Default: <code>admin</code> / <code>admin</code> — you must change the password on first login.</p>
+      <p class="hint">Default: <code>admin</code> / <code>admin</code> — change password on first login.</p>
     </div>
   </section>
 
-  <!-- FORCE PASSWORD CHANGE -->
   <section id="view-change" class="view centered" hidden>
     <div class="auth-panel">
       <p class="brand">AutomationForge</p>
       <h1>Change password</h1>
-      <p class="sub">Required before you can use the dashboard. Pick something only you know.</p>
+      <p class="sub">Required before you can use the dashboard.</p>
       <form id="change-form">
-        <label>
-          New password
-          <input id="new-pass" type="password" autocomplete="new-password" minlength="8" required />
-        </label>
-        <label>
-          Confirm password
-          <input id="confirm-pass" type="password" autocomplete="new-password" minlength="8" required />
-        </label>
+        <label>New password<input id="new-pass" type="password" autocomplete="new-password" minlength="8" required /></label>
+        <label>Confirm password<input id="confirm-pass" type="password" autocomplete="new-password" minlength="8" required /></label>
         <p id="change-error" class="error" hidden></p>
         <button type="submit" class="btn primary">Save &amp; continue</button>
       </form>
     </div>
   </section>
 
-  <!-- DASHBOARD -->
   <section id="view-app" class="view app" hidden>
     <header class="topbar">
       <div>
         <p class="brand compact">AutomationForge</p>
-        <p class="tagline">Control panel · browser automation stays on your machine</p>
+        <p class="tagline">Simple setup · 1–5 URL workflow · local fill engine</p>
       </div>
       <div class="topbar-actions">
         <span id="whoami" class="whoami"></span>
@@ -71,89 +56,143 @@
     <main class="layout">
       <aside class="sidebar">
         <nav>
-          <button class="nav-btn active" data-tab="overview" type="button">Overview</button>
-          <button class="nav-btn" data-tab="profiles" type="button">Profiles &amp; data</button>
-          <button class="nav-btn" data-tab="run" type="button">Run locally</button>
+          <button class="nav-btn active" data-tab="info" type="button">1. My info</button>
+          <button class="nav-btn" data-tab="workflow" type="button">2. Applications</button>
+          <button class="nav-btn" data-tab="export" type="button">3. Download &amp; run</button>
           <button class="nav-btn" data-tab="logs" type="button">Logs</button>
         </nav>
         <div class="sidebar-note">
           <strong>Safety</strong>
-          Every form submit requires your explicit approval. Legitimate personal use only.
+          Every form submit still needs your yes/no on your computer. Legitimate personal use only.
         </div>
       </aside>
 
       <div class="content">
-        <article id="tab-overview" class="tab">
-          <h2>Overview</h2>
-          <p class="lead">
-            Manage profiles and review run guidance here. Playwright + LLM filling runs on your PC
-            so credentials and browsing stay private.
-          </p>
-          <div class="stat-row">
-            <div class="stat">
-              <span class="stat-label">Hosted role</span>
-              <span class="stat-value">Dashboard + auth</span>
-            </div>
-            <div class="stat">
-              <span class="stat-label">Automation engine</span>
-              <span class="stat-value">Local Python CLI</span>
-            </div>
-            <div class="stat">
-              <span class="stat-label">Submit gate</span>
-              <span class="stat-value">Always y/n</span>
-            </div>
+        <!-- MY INFO -->
+        <article id="tab-info" class="tab">
+          <h2>My info</h2>
+          <p class="lead">Type once. These fields are used to fill applications. No JSON required.</p>
+
+          <form id="info-form" class="form-grid">
+            <fieldset>
+              <legend>Identity</legend>
+              <label>First name<input name="first_name" autocomplete="given-name" /></label>
+              <label>Last name<input name="last_name" autocomplete="family-name" /></label>
+              <label>Full name<input name="full_name" autocomplete="name" /></label>
+              <label>Email<input name="email" type="email" autocomplete="email" /></label>
+              <label>Phone<input name="phone" type="tel" autocomplete="tel" /></label>
+              <label>Date of birth<input name="date_of_birth" type="date" /></label>
+            </fieldset>
+
+            <fieldset>
+              <legend>Address</legend>
+              <label class="span-2">Street<input name="street" autocomplete="street-address" /></label>
+              <label>City<input name="city" autocomplete="address-level2" /></label>
+              <label>State<input name="state" autocomplete="address-level1" /></label>
+              <label>ZIP<input name="zip" autocomplete="postal-code" /></label>
+              <label>Country<input name="country" autocomplete="country-name" /></label>
+            </fieldset>
+
+            <fieldset>
+              <legend>Extras (optional)</legend>
+              <label>LinkedIn<input name="linkedin" placeholder="https://linkedin.com/in/…" /></label>
+              <label>Website<input name="website" placeholder="https://…" /></label>
+              <label class="span-2">Notes<textarea name="notes" rows="2" placeholder="Anything the forms often ask…"></textarea></label>
+            </fieldset>
+
+            <fieldset>
+              <legend>Application type extras</legend>
+              <p class="field-hint">Only fill what you need for the apps you’re running today.</p>
+              <label>Desired salary<input name="desired_salary" placeholder="e.g. 85000" /></label>
+              <label>Years experience<input name="years_experience" placeholder="e.g. 5" /></label>
+              <label>Work authorization<input name="work_authorization" placeholder="Authorized to work" /></label>
+              <label>Monthly income<input name="monthly_income" placeholder="e.g. 6000" /></label>
+              <label>Employer<input name="employer" /></label>
+              <label>Move-in date<input name="move_in_date" type="date" /></label>
+            </fieldset>
+          </form>
+
+          <div class="toolbar sticky-actions">
+            <button id="btn-save-info" class="btn primary" type="button">Save my info</button>
+            <button id="btn-clear-info" class="btn ghost" type="button">Clear form</button>
+            <p id="info-status" class="status" hidden></p>
           </div>
-          <ol class="steps">
-            <li>Edit application profiles below (or in <code>personal_data.json</code>).</li>
-            <li>On your machine: <code>python main.py</code> or <code>streamlit run streamlit_app.py</code>.</li>
-            <li>Paste any form URL — approve before submit — logs land in <code>application_log.json</code> + <code>logs/*.txt</code>.</li>
-          </ol>
         </article>
 
-        <article id="tab-profiles" class="tab" hidden>
-          <h2>Profiles &amp; personal data</h2>
-          <p class="lead">Edit JSON prefills for each application type. Download to sync with your local agent.</p>
-          <div class="toolbar">
-            <button id="btn-load-sample" class="btn ghost" type="button">Load sample</button>
-            <button id="btn-download-data" class="btn ghost" type="button">Download JSON</button>
-            <label class="btn ghost file-btn">
-              Upload JSON
-              <input id="upload-data" type="file" accept="application/json,.json" hidden />
+        <!-- WORKFLOW 1-5 URLS -->
+        <article id="tab-workflow" class="tab" hidden>
+          <h2>Applications (1–5 URLs)</h2>
+          <p class="lead">Paste the application links you want filled this session. Max 5. Each can use a different profile.</p>
+
+          <div class="workflow-meta">
+            <label>
+              Default profile for new rows
+              <select id="default-profile">
+                <option value="general">General</option>
+                <option value="job_application">Job application</option>
+                <option value="housing">Housing</option>
+                <option value="registration">Registration</option>
+              </select>
             </label>
-            <button id="btn-save-data" class="btn primary" type="button">Save in browser</button>
+            <label>
+              Workflow name
+              <input id="workflow-name" placeholder="e.g. Friday apps" />
+            </label>
           </div>
-          <textarea id="data-editor" spellcheck="false" aria-label="personal data JSON"></textarea>
-          <p id="data-status" class="status" hidden></p>
+
+          <div id="url-rows" class="url-rows"></div>
+
+          <div class="toolbar">
+            <button id="btn-add-url" class="btn ghost" type="button">+ Add URL</button>
+            <button id="btn-save-workflow" class="btn primary" type="button">Save workflow</button>
+            <p id="workflow-status" class="status" hidden></p>
+          </div>
+          <p class="muted" id="url-count-hint">0 of 5 applications</p>
         </article>
 
-        <article id="tab-run" class="tab" hidden>
-          <h2>Run locally</h2>
-          <p class="lead">One-shot CLI after setup. Netlify cannot run a stealth browser — use your machine.</p>
-          <pre class="codeblock">cd Project App Workflow
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-playwright install chromium
-copy .env.example .env
-# Edit .env + personal_data.json
-python main.py</pre>
-          <p>Streamlit UI: <code>streamlit run streamlit_app.py</code></p>
-          <p>Optional: start Ollama (<code>ollama pull llama3.2</code>) or set an API key in <code>.env</code>.</p>
+        <!-- EXPORT & RUN -->
+        <article id="tab-export" class="tab" hidden>
+          <h2>Download &amp; run</h2>
+          <p class="lead">Download both files into your project folder, then run one command.</p>
+
+          <div class="export-cards">
+            <div class="export-card">
+              <h3>personal_data.json</h3>
+              <p>Your filled-in info for the agent.</p>
+              <button id="btn-dl-personal" class="btn primary" type="button">Download personal data</button>
+            </div>
+            <div class="export-card">
+              <h3>workflow.json</h3>
+              <p>Your 1–5 application URLs.</p>
+              <button id="btn-dl-workflow" class="btn primary" type="button">Download workflow</button>
+            </div>
+          </div>
+
+          <h3 class="subhead">On your computer</h3>
+          <pre class="codeblock"># Put both JSON files in the project folder, then:
+python main.py --workflow workflow.json</pre>
+          <p class="muted">The agent opens each URL in order, fills with your info, and asks <strong>y/n</strong> before every submit.</p>
+
+          <details class="advanced">
+            <summary>Advanced: raw JSON</summary>
+            <textarea id="data-editor" spellcheck="false" aria-label="personal data JSON"></textarea>
+            <div class="toolbar">
+              <button id="btn-sync-from-json" class="btn ghost" type="button">Load JSON → form</button>
+              <button id="btn-sync-to-json" class="btn ghost" type="button">Form → JSON</button>
+              <label class="btn ghost file-btn">Upload JSON<input id="upload-data" type="file" accept="application/json,.json" hidden /></label>
+            </div>
+          </details>
         </article>
 
+        <!-- LOGS -->
         <article id="tab-logs" class="tab" hidden>
-          <h2>Application logs</h2>
-          <p class="lead">Paste or upload <code>application_log.json</code> from your local runs to review here.</p>
+          <h2>Logs</h2>
+          <p class="lead">Upload <code>application_log.json</code> from local runs to review here.</p>
           <div class="toolbar">
-            <label class="btn ghost file-btn">
-              Upload log JSON
-              <input id="upload-log" type="file" accept="application/json,.json" hidden />
-            </label>
+            <label class="btn ghost file-btn">Upload log JSON<input id="upload-log" type="file" accept="application/json,.json" hidden /></label>
             <button id="btn-clear-log" class="btn ghost" type="button">Clear view</button>
           </div>
-          <div id="log-view" class="log-view">
-            <p class="muted">No logs loaded yet.</p>
-          </div>
+          <div id="log-view" class="log-view"><p class="muted">No logs loaded yet.</p></div>
         </article>
       </div>
     </main>

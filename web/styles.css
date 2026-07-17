@@ -259,10 +259,105 @@ input:focus, textarea:focus {
 .log-item strong { display: block; margin-bottom: 0.25rem; }
 .log-meta { font-size: 0.82rem; color: var(--muted); }
 
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+fieldset {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem 0.35rem;
+  background: color-mix(in srgb, var(--panel) 70%, transparent);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1rem;
+}
+legend {
+  padding: 0 0.35rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+.field-hint {
+  grid-column: 1 / -1;
+  margin: 0 0 0.25rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.span-2 { grid-column: 1 / -1; }
+fieldset label { margin-bottom: 0.65rem; }
+fieldset textarea { resize: vertical; min-height: 64px; }
+.sticky-actions { margin-top: 1rem; align-items: center; }
+.sticky-actions .btn.primary { width: auto; }
+
+.workflow-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+.url-rows { display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 1rem; }
+.url-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem;
+  background: var(--panel);
+}
+.url-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.65rem;
+}
+.url-num { font-weight: 600; color: var(--accent); }
+.url-card-grid {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 0.75rem;
+}
+.btn-sm { padding: 0.35rem 0.65rem; font-size: 0.85rem; width: auto; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+.export-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+.export-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.1rem;
+  background: var(--panel);
+}
+.export-card h3 { margin: 0 0 0.35rem; font-size: 1.05rem; }
+.export-card p { color: var(--muted); margin: 0 0 0.85rem; font-size: 0.9rem; }
+.export-card .btn.primary { width: auto; }
+.subhead {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 1.35rem;
+  margin: 0 0 0.5rem;
+}
+.advanced {
+  margin-top: 1.5rem;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem 1rem;
+}
+.advanced summary {
+  cursor: pointer;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+.advanced #data-editor { min-height: 220px; margin-bottom: 0.75rem; }
+
 @media (max-width: 800px) {
   .layout { grid-template-columns: 1fr; }
   .sidebar { border-right: none; border-bottom: 1px solid var(--line); }
   .sidebar nav { flex-direction: row; flex-wrap: wrap; }
   .stat-row { grid-template-columns: 1fr; }
   .topbar { flex-direction: column; }
+  fieldset, .workflow-meta, .export-cards, .url-card-grid { grid-template-columns: 1fr; }
 }

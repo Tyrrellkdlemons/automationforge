@@ -7,6 +7,8 @@ Legitimate personal use only — you are responsible for ToS and applicable laws
 
 from __future__ import annotations
 
+import argparse
+import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -30,6 +32,7 @@ from automationforge.email_service import get_email_service, ManualEmailService
 from automationforge.llm_agent import LLMAgent
 
 console = Console()
+MAX_WORKFLOW_URLS = 5
 
 
 BANNER = f"""
@@ -360,59 +363,201 @@ def show_llm_health(llm: LLMAgent) -> None:
     console.print(f"Preferred mode: {health.get('preferred')}")
 
 
+def load_workflow(path: Path) -> list[dict[str, Any]]:
+    """Load workflow.json with 1–5 application URLs."""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    apps = data.get("applications") or data.get("urls") or []
+    if isinstance(apps, list) and apps and isinstance(apps[0], str):
+        apps = [{"url": u, "profile": "general"} for u in apps]
+
+    cleaned: list[dict[str, Any]] = []
+    for item in apps:
+        if not isinstance(item, dict):
+            continue
+        url = str(item.get("url") or "").strip()
+        if not url:
+            continue
+        cleaned.append(
+            {
+                "url": url,
+                "profile": str(item.get("profile") or "general").strip() or "general",
+                "extra_instructions": str(
+                    item.get("extra_instructions") or item.get("notes") or ""
+                ).strip(),
+            }
+        )
+
+    if not cleaned:
+        raise ValueError(f"No application URLs found in {path}")
+    if len(cleaned) > MAX_WORKFLOW_URLS:
+        raise ValueError(
+            f"Workflow has {len(cleaned)} URLs; max is {MAX_WORKFLOW_URLS}. "
+            "Trim workflow.json and try again."
+        )
+    return cleaned
+
+
+def collect_urls_interactive(default_profile: str) -> list[dict[str, Any]]:
+    """Ask for 1–5 URLs in one shot (friendly batch mode)."""
+    console.print(
+        Panel(
+            f"Enter [bold]1–{MAX_WORKFLOW_URLS}[/] application URLs.\n"
+            "Paste one URL per prompt. Leave blank to finish (after at least one).",
+            title="Batch workflow",
+            border_style="cyan",
+        )
+    )
+    apps: list[dict[str, Any]] = []
+    while len(apps) < MAX_WORKFLOW_URLS:
+        url = Prompt.ask(
+            f"URL {len(apps) + 1}/{MAX_WORKFLOW_URLS} (blank=done)",
+            default="",
+        ).strip()
+        if not url:
+            break
+        profile = Prompt.ask("Profile for this URL", default=default_profile).strip() or default_profile
+        notes = Prompt.ask("Notes / extra instructions (optional)", default="")
+        apps.append({"url": url, "profile": profile, "extra_instructions": notes})
+    if not apps:
+        raise ValueError("Need at least one URL")
+    return apps
+
+
+def run_workflow(
+    dm: DataManager,
+    llm: LLMAgent,
+    applications: list[dict[str, Any]],
+    *,
+    email_info: dict[str, Any] | None = None,
+    force: bool = False,
+) -> None:
+    total = len(applications)
+    console.print(f"[bold cyan]Workflow:[/] {total} application(s) queued")
+    for i, app in enumerate(applications, 1):
+        console.print()
+        console.rule(f"[bold]Application {i}/{total}[/]")
+        try:
+            run_application(
+                dm,
+                llm,
+                url=app["url"],
+                profile=app.get("profile") or "general",
+                email_info=email_info,
+                force=force,
+                extra_instructions=app.get("extra_instructions") or "",
+            )
+        except Exception as exc:
+            console.print(f"[red]Unhandled error on app {i}:[/] {exc}")
+            if i < total and not Confirm.ask("Continue to next URL?", default=True):
+                break
+        if i < total and not Confirm.ask("Continue to next application?", default=True):
+            console.print("[yellow]Workflow stopped early.[/]")
+            break
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="AutomationForge v2 — personal form fill assistant")
+    parser.add_argument(
+        "--workflow",
+        "-w",
+        type=str,
+        default="",
+        help="Path to workflow.json with 1–5 application URLs",
+    )
+    parser.add_argument(
+        "--batch",
+        action="store_true",
+        help="Interactive batch: enter 1–5 URLs in one session",
+    )
+    parser.add_argument("--force", action="store_true", help="Force runs even if URL was logged before")
+    parser.add_argument("--skip-email", action="store_true", help="Skip optional email verification step")
+    return parser.parse_args()
+
+
 def main() -> None:
+    args = parse_args()
     print_banner()
     dm = DataManager()
     llm = LLMAgent()
 
     show_llm_health(llm)
+    email_info = None if args.skip_email else run_email_step()
 
-    email_info = run_email_step()
+    if args.workflow:
+        path = Path(args.workflow)
+        if not path.is_absolute():
+            path = ROOT / path
+        applications = load_workflow(path)
+        console.print(f"Loaded workflow from [bold]{path.name}[/]")
+        run_workflow(dm, llm, applications, email_info=email_info, force=args.force)
+        console.print("[dim]Remember: you are responsible for site ToS and applicable laws.[/]")
+        return
 
-    profile = choose_profile(dm)
-    console.print(f"Active profile: [bold]{profile}[/]")
+    if args.batch:
+        profile = choose_profile(dm)
+        applications = collect_urls_interactive(profile)
+        force = args.force or Confirm.ask("Force run even if duplicate URL?", default=False)
+        run_workflow(dm, llm, applications, email_info=email_info, force=force)
+        console.print("[dim]Remember: you are responsible for site ToS and applicable laws.[/]")
+        return
 
-    force_default = False
-    while True:
-        console.print()
-        url = Prompt.ask(
-            "[bold]Paste application URL[/] (or [cyan]q[/]=quit, [cyan]p[/]=profile, "
-            "[cyan]e[/]=email, [cyan]h[/]=health)"
-        ).strip()
-        if not url:
-            continue
-        low = url.lower()
-        if low in {"q", "quit", "exit"}:
-            console.print("Goodbye.")
-            break
-        if low in {"p", "profile"}:
-            profile = choose_profile(dm)
-            continue
-        if low in {"e", "email"}:
-            email_info = run_email_step()
-            continue
-        if low in {"h", "health"}:
-            show_llm_health(llm)
-            continue
+    mode = Prompt.ask("Mode", choices=["batch", "single", "workflow"], default="batch")
 
-        extra = Prompt.ask("Extra instructions for this form (optional)", default="")
-        force = Confirm.ask("Force run even if duplicate URL?", default=force_default)
+    if mode == "workflow":
+        wf_path = Prompt.ask("Path to workflow.json", default="workflow.json")
+        path = Path(wf_path)
+        if not path.is_absolute():
+            path = ROOT / path
+        applications = load_workflow(path)
+        force = Confirm.ask("Force run even if duplicate URL?", default=False)
+        run_workflow(dm, llm, applications, email_info=email_info, force=force)
+    elif mode == "batch":
+        profile = choose_profile(dm)
+        applications = collect_urls_interactive(profile)
+        force = Confirm.ask("Force run even if duplicate URL?", default=False)
+        run_workflow(dm, llm, applications, email_info=email_info, force=force)
+    else:
+        profile = choose_profile(dm)
+        console.print(f"Active profile: [bold]{profile}[/]")
+        force_default = False
+        while True:
+            console.print()
+            url = Prompt.ask(
+                "[bold]Paste application URL[/] (or [cyan]q[/]=quit, [cyan]p[/]=profile, "
+                "[cyan]e[/]=email, [cyan]h[/]=health)"
+            ).strip()
+            if not url:
+                continue
+            low = url.lower()
+            if low in {"q", "quit", "exit"}:
+                console.print("Goodbye.")
+                break
+            if low in {"p", "profile"}:
+                profile = choose_profile(dm)
+                continue
+            if low in {"e", "email"}:
+                email_info = run_email_step()
+                continue
+            if low in {"h", "health"}:
+                show_llm_health(llm)
+                continue
 
-        try:
-            run_application(
-                dm,
-                llm,
-                url=url,
-                profile=profile,
-                email_info=email_info,
-                force=force,
-                extra_instructions=extra,
-            )
-        except Exception as exc:
-            console.print(f"[red]Unhandled error:[/] {exc}")
-
-        if not Confirm.ask("Process another URL?", default=True):
-            break
+            extra = Prompt.ask("Extra instructions for this form (optional)", default="")
+            force = Confirm.ask("Force run even if duplicate URL?", default=force_default)
+            try:
+                run_application(
+                    dm,
+                    llm,
+                    url=url,
+                    profile=profile,
+                    email_info=email_info,
+                    force=force,
+                    extra_instructions=extra,
+                )
+            except Exception as exc:
+                console.print(f"[red]Unhandled error:[/] {exc}")
+            if not Confirm.ask("Process another URL?", default=True):
+                break
 
     console.print("[dim]Remember: you are responsible for site ToS and applicable laws.[/]")
 
