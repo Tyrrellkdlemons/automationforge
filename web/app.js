@@ -93,16 +93,20 @@ async function api(path, options = {}) {
 }
 
 async function bootstrap() {
-  const { res, data } = await api("me", { method: "GET" });
-  if (!res.ok || !data.authenticated) {
+  try {
+    const { res, data } = await api("me", { method: "GET" });
+    if (!res.ok || !data.authenticated) {
+      show("login");
+      return;
+    }
+    if (data.mustChangePassword) {
+      show("change");
+      return;
+    }
+    enterApp(data.username);
+  } catch {
     show("login");
-    return;
   }
-  if (data.mustChangePassword) {
-    show("change");
-    return;
-  }
-  enterApp(data.username);
 }
 
 function enterApp(username) {

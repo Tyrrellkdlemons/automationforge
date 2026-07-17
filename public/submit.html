@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Submit — PEEEZMachine AppFlow</title>
+  <title>Get started — PeeezMachine</title>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Roboto+Condensed:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/styles.css" />
   <script src="https://js.stripe.com/v3/"></script>
   <style>
     .submit-wrap { max-width: 540px; margin: 0 auto; padding: 2.75rem 1.25rem 4rem; position: relative; z-index: 1; }
-    .submit-wrap h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 5vw, 2.55rem); letter-spacing: -0.03em; margin: 0.2rem 0 0.55rem; }
-    .submit-card { background: color-mix(in srgb, var(--panel) 94%, transparent); border: 1px solid var(--line); border-radius: 18px; padding: 1.5rem; box-shadow: var(--shadow); }
-    .success-box { border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); background: rgba(228,168,75,.1); border-radius: 14px; padding: 1.1rem; margin-top: 1rem; animation: rise .4s ease-out; }
+    .submit-wrap h1 { font-family: var(--display); font-weight: 900; font-size: clamp(2rem, 5vw, 2.55rem); letter-spacing: -0.03em; text-transform: uppercase; margin: 0.35rem 0 0.55rem; }
+    .submit-card { background: color-mix(in srgb, var(--panel) 94%, transparent); border: 1px solid var(--line); border-radius: 12px; padding: 1.5rem; box-shadow: 0 24px 60px rgba(0,0,0,.35); }
+    .success-box { border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); background: rgba(215,167,43,.1); border-radius: 12px; padding: 1.1rem; margin-top: 1rem; animation: rise .4s ease-out; }
     .addr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
     .addr-grid .span-2 { grid-column: 1 / -1; }
     #payment-section[hidden], #success[hidden] { display: none !important; }
@@ -24,21 +25,16 @@
   <div class="bg-grid" aria-hidden="true"></div>
   <div class="submit-wrap">
     <span class="brand-mark">
-        <span class="brand-gear" aria-hidden="true"><span>P</span></span>
-        <span class="brand-words">
-          <strong>PEEEZ<span>Machine</span></strong>
-          <small>AppFlow · Secure operations</small>
-        </span>
+      <span class="brand-gear" aria-hidden="true"><span>P</span></span>
+      <span class="brand-words">
+        <strong>Peeez<span>Machine</span></strong>
+        <small>Public intake · New workflow</small>
       </span>
-        <span class="brand-words">
-          <strong>PEEEZ<span>Machine</span></strong>
-          <small>AppFlow · Secure operations</small>
-        </span>
-      </span>
+    </span>
     <h1>Start your submission</h1>
     <p class="lead" style="color:var(--muted);margin:0 0 1.25rem;line-height:1.5">
       Required: name, email, date of birth, and state.
-      Street / city / ZIP are optional — if blank, PEEEZMachine assigns a residential address in your state.
+      Street / city / ZIP are optional — if blank, PeeezMachine assigns a residential address in your state.
     </p>
 
     <form id="submit-form" class="submit-card">
@@ -69,16 +65,16 @@
       <details style="margin-top:.75rem">
         <summary style="cursor:pointer;color:var(--muted);font-size:.85rem">Access token</summary>
         <label>Submission secret
-          <input id="submission-secret" type="password" required placeholder="Provided by PEEEZMachine" />
+          <input id="submission-secret" type="password" required placeholder="Provided by PeeezMachine" />
         </label>
       </details>
 
       <p id="form-error" class="error" hidden></p>
-      <button type="submit" class="btn primary" id="btn-submit">Submit to PEEEZMachine</button>
+      <button type="submit" class="btn primary" id="btn-submit">Submit to PeeezMachine</button>
     </form>
 
     <div id="success" class="success-box" hidden>
-      <strong>You’re in — PEEEZMachine received your submission</strong>
+      <strong>You’re in — PeeezMachine received your submission</strong>
       <p style="margin:.55rem 0 0">Submission ID:</p>
       <code id="submission-id"></code>
       <p style="margin-top:.85rem;color:var(--muted);font-size:.9rem;line-height:1.45">
@@ -86,7 +82,7 @@
         Full verification and next-step instructions arrive within <strong>24–48 hours</strong>.
       </p>
     </div>
-    <p class="trust">🛡️ Data is encrypted in transit. Only PEEEZMachine operators can process your submission.</p>
+    <p class="trust">Data is encrypted in transit. Only PeeezMachine operators can process your submission.</p>
   </div>
 
   <script>
@@ -191,7 +187,7 @@
         err.textContent = ex.message || "Error";
       } finally {
         btn.disabled = false;
-        btn.textContent = "Submit to PEEEZMachine";
+        btn.textContent = "Submit to PeeezMachine";
       }
     });
   </script>
